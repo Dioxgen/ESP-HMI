@@ -85,9 +85,13 @@ PCF8563 是 PHILIPS 公司推出的一款**工业级内含I2C 总线接口功能
 
 #### PCB:
 
-验证板：只有最基础硬件（包括SHT30）
+验证板：只有最基础硬件（包括SHT30），注意 GPIO2 在烧录程序时需断开，如果你要频繁烧录程序，最好 PCB上飞线一个开关，或者拔下开发板（如果你愿意的话）。
 
+[Gerber_PCB_ESP32开发直插板.zip](https://github.com/SoTWild/ESP-HMI/blob/main/PCB/验证板/Gerber_PCB_ESP32开发直插板.zip)
 
+<img src="https://i2.imgu.cc/images/2022/04/27/CK8ux.jpg" style="zoom:10%;" />
+
+<center>验证板</center>
 
 ------
 
