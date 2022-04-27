@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "media_player.h": "c"
+    },
+    "cmake.configureOnOpen": false
+}
