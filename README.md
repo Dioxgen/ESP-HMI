@@ -83,7 +83,89 @@ PCF8563 是 PHILIPS 公司推出的一款**工业级内含I2C 总线接口功能
 
 <center>PCF8563 模块</center>
 
+#### PCB:
+
+验证板：只有最基础硬件（包括SHT30）
+
+
+
 ------
 
 ### 软件：
+
+本人一切嵌入式皆为自学，~~原谅我写成屎山~~
+
+[Media_Player.h](https://github.com/SoTWild/ESP-HMI/blob/main/ESP32-HMI/include/Media_Player.h) 这里是**主要**函数：
+
+```c
+void Mjpeg_start(const char *MJPEG_FILENAME, const char *AUDIO_FILENAME);
+```
+
+这是进行 **Mjpeg** 视频播放，源代码由[Play Video With ESP32](https://www.instructables.com/Play-Video-With-ESP32/)修改而来，详情见[MjpegClass.h](https://github.com/SoTWild/ESP-HMI/blob/main/ESP32-HMI/include/MjpegClass.h)。
+
+```c
+void drawSdJpeg(const char *filename, int xpos, int ypos);
+```
+
+这是绘制 **.jpg** 格式图片，源代码由[Bodmer/JPEGDecoder](https://github.com/Bodmer/JPEGDecoder)修改而来。
+
+```c
+void MP3_start(const char *filename);
+```
+
+这是进行 .mp3 格式音频的播放，源代码由[ESP8266Audio](https://github.com/earlephilhower/ESP8266Audio)修改而来。
+
+```c
+void PCM_start(const char *AUDIOFILENAME);
+```
+
+这是进行 .pcm 格式音频的播放，源代码由[Play Video With ESP32](https://www.instructables.com/Play-Video-With-ESP32/)修改而来。
+
+```c
+String readFileLine(const char* path, int num);
+```
+
+读取 .txt 文本的某一行，源代码来自[peng-zhihui/HoloCubic](https://github.com/peng-zhihui/HoloCubic)。
+
+```c
+void BleAudio();
+```
+
+蓝牙音频接收，来自[ESP32-A2DP](https://github.com/pschatzmann/ESP32-A2DP)。
+
+
+
+[Main.h](https://github.com/SoTWild/ESP-HMI/blob/main/ESP32-HMI/include/Main.h) 这是应用：
+
+> Album 相册
+>
+> Game 小游戏
+>
+> Sounder 音乐播放器
+>
+> Vision 视频播放器
+>
+> Ebook 电子书阅读器
+>
+> Settings 设置
+
+
+
+[main.cpp](https://github.com/SoTWild/ESP-HMI/blob/main/ESP32-HMI/src/main.cpp) 开机时执行的程序，包括：
+
+> 1）加载串口
+>
+> 2）屏幕初始化
+>
+> 3）触摸初始化
+>
+> 4）挂载SD卡
+>
+> 5）连接 Wi-Fi
+>
+> 6）读取设置文件
+>
+> 7）运行 MainPage(); 主页程序
+
+------
 
