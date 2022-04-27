@@ -93,11 +93,19 @@ PCF8563 是 PHILIPS 公司推出的一款**工业级内含I2C 总线接口功能
 
 <center>验证板</center>
 
+最终板：硬件齐全，自动烧录，配备电池。
+
+[还没设计完……](https://github.com/SoTWild/ESP-HMI)
+
+##### 元件解读：
+
+[还没设计完……](https://github.com/SoTWild/ESP-HMI)
+
 ------
 
 ### 软件：
 
-本人一切嵌入式皆为自学，~~原谅我写成屎山~~
+本人一切嵌入式皆为自学，~~原谅我写成屎山或执行效率不高~~
 
 [Media_Player.h](https://github.com/SoTWild/ESP-HMI/blob/main/ESP32-HMI/include/Media_Player.h) 这里是**主要**函数：
 
