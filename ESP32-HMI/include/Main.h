@@ -198,7 +198,7 @@ void MP3_start_Sounder(const char *afilename,String Musicname) {
   
   while (1) {
     if (mp3->isRunning()) {
-      CreatCrollWords(350,30,0,300,40,1,4,TFT_WHITE,Musicname);
+      CreatCrollWords(450,30,0,300,40,1,4,TFT_WHITE,Musicname);
       if (touch.Pressed()) {
         if (300 < touch.X() && touch.X() < 450 && 100 < touch.Y() && touch.Y() < 140){
           mp3->stop();
@@ -310,11 +310,8 @@ void listMusic(int MusicPage){
   tft.print("Next");
   tft.setTextColor(TFT_DARKGREEN);
 
-  MusicBline = (MusicPage - 1) * 10 - 1;
-  if (MusicBline < 0){
-    MusicBline = 1;
-  }
-  MusicEline = MusicPage * 9;
+  MusicBline = (MusicPage - 1) * 8 + 1;
+  MusicEline = MusicBline + 7;
   strlen = strlen + 35;
   Serial.printf("strlen: %d\n",strlen);
   //tft.setCursor(470,230);
@@ -325,7 +322,7 @@ void listMusic(int MusicPage){
 
   tft.setTextColor(TFT_DARKGREEN);
 
-  while (MusicBline < MusicEline) {
+  while (MusicBline <= MusicEline) {
     filename = readFileLine(filedir.c_str(), MusicBline).substring(strlen);
     tft.println(filename.substring(0,filename.length()-4));
     //Serial.println(filename.substring(0,filename.length()-4));
@@ -522,11 +519,8 @@ void listVideo(int VideoPage){
   tft.setTextColor(TFT_DARKGREEN);
   tft.setCursor(0, 0);
 
-  VideoBline = (VideoPage - 1) * 10 - 1;
-  if (VideoBline < 0){
-    VideoBline = 1;
-  }
-  VideoEline = VideoPage * 8;
+  VideoBline = (VideoPage - 1) * 8 + 1;
+  VideoEline = VideoBline + 7;
 
   strlen = strlen + 35;
   Serial.printf("strlen: %d\n",strlen);
