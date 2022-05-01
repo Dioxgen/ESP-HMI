@@ -69,8 +69,7 @@ static int drawMCU(JPEGDRAW *pDraw) {
 }
 void Mjpeg_start(const char *MJPEG_FILENAME, const char *AUDIO_FILENAME) {
   gfx->fillScreen(TFT_BLACK);
-  gfx->setCursor(0,0);
-  gfx->setTextColor(TFT_BLACK);
+  
   // Init Audio
   i2s_config_t i2s_config_dac = {
     .mode = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX | I2S_MODE_DAC_BUILT_IN),
@@ -131,13 +130,6 @@ void Mjpeg_start(const char *MJPEG_FILENAME, const char *AUDIO_FILENAME) {
             i2s_write_bytes((i2s_port_t)0, (char *)aBuf, 980, 0);
 
             while (vFile.available() && aFile.available()) {
-              /*if (IfVision == 1){
-                if (touch.Pressed()){
-                  if (touch.X() > 400){
-                    break;
-                  }
-                }
-              }*/
               // Read audio
               aFile.read(aBuf, 2940);
               // aFile.read(aBuf, 5880);
@@ -165,7 +157,7 @@ void Mjpeg_start(const char *MJPEG_FILENAME, const char *AUDIO_FILENAME) {
                 int remain_ms = next_frame_ms - millis();
                 total_remain += remain_ms;
                 if (remain_ms > 0) {
-                  //                  delay(remain_ms);
+                  //delay(remain_ms);
                 }
               }
               else {
@@ -245,7 +237,7 @@ void Mjpeg_start(const char *MJPEG_FILENAME, const char *AUDIO_FILENAME) {
             total_remain = 0;
             total_show_video = 0;
             EnableVC = 1;
-            delay(2000);
+            delay(1500);
             gfx->fillScreen(TFT_BLACK);
           }
         }
@@ -526,7 +518,7 @@ void MP3_start(const char *filename) {
   out = new AudioOutputI2S(0, 1, 128);
   mp3 = new AudioGeneratorMP3();
   mp3->begin(file, out);
-  while (0 == 0) {
+  while (1) {
     if (mp3->isRunning()) {
       if (!mp3->loop()) {
         fileline = 1;
@@ -534,8 +526,6 @@ void MP3_start(const char *filename) {
       }
     }
     else {
-      i2s_driver_uninstall((i2s_port_t)0);
-      fileline = 1;
       Serial.printf("MP3 done\n");
       break;
     }

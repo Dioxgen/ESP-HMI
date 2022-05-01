@@ -129,6 +129,7 @@ void setup() {
     }
   }
   else{
+    //MP3_start("/System/Media/welcome.mp3");
     User = readFileLine("/System/Settings/LastUser.txt", 1);
     Serial.print("User:");
     Serial.println(User);

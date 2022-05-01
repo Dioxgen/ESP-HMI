@@ -106,21 +106,21 @@ void Signin(){
       else if ( 400 < touch.X()) {
         filedir = String ("/User/") + User + String("/Config/") + String("password.txt");
         if (password == readFileLine(filedir.c_str(), 1)){
-            tft.setCursor(225, 85);
-            tft.fillRoundRect(220,70, 220, 50, 8, TFT_WHITE);
-            tft.print("Welcome!");
-            Serial.println(password);
-            delay(1000);
-            break;
+          tft.setCursor(225, 85);
+          tft.fillRoundRect(220,70, 220, 50, 8, TFT_WHITE);
+          tft.print("Welcome!");
+          Serial.println(password);
+          delay(1000);
+          break;
         }
         else{
-            tft.setCursor(225, 85);
-            tft.fillRoundRect(220,70, 220, 50, 5, TFT_WHITE);
-            tft.print("Wrong Password!");
-            Serial.println(password);
-            delay(1500);
-            password = "";
-            Signin();
+          tft.setCursor(225, 85);
+          tft.fillRoundRect(220,70, 220, 50, 8, TFT_WHITE);
+          tft.print("Wrong Password!");
+          Serial.println(password);
+          delay(1500);
+          password = "";
+          Signin();
         }
       }
     }
