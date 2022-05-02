@@ -108,36 +108,7 @@ void setup() {
 //  tft.println(readFileLine("/System/Settings/LastUser.txt", 1));
 //  tft.println(readFileLine("/User/SoTWild/Data/Others/password.txt", 1));
   }
-  Userlogin();/*
-  if(readFileLine("/System/Settings/Initial interface.txt", 1) == String("true")){
-    while (1) {
-      if (touch.Pressed()) {
-        if ((0 < touch.Y()) && (touch.Y() < 30)) {
-          User = readFileLine("/System/Users/Users.txt", 1);
-          Signin();
-          break;
-        }
-        if ((30 < touch.Y()) && (touch.Y() < 60)) {
-          User = readFileLine("/System/Users/Users.txt", 2);
-          Signin();
-          break;
-        }
-        if ((60 < touch.Y()) && (touch.Y() < 90)) {
-          User = readFileLine("/System/Users/Users.txt", 3);
-          Signin();
-          break;
-        }
-      }
-    }
-  }
-  else{
-    //MP3_start("/System/Media/welcome.mp3");
-    User = readFileLine("/System/Settings/LastUser.txt", 1);
-    Serial.print("User:");
-    Serial.println(User);
-    Signin();
-  }*/
-
+  Userlogin();
   line = 1;
   tft.fillScreen(TFT_BLACK);
   Userdir = String("/User/") + User + String("/Config");
