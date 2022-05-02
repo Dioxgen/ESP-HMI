@@ -30,6 +30,11 @@ int BookPage = 1;
 int EnableBC = 0;
 int BookBline;
 int BookEline;
+int UserPage = 1;
+int EnableUC = 0;
+int UserBline;
+int UserEline;
+int b;
 
 bool notice;
 String n_otice;

@@ -18,6 +18,7 @@
   2022/04/14 完成编写 Vision
   2022/04/17 完善 Ebook
   2022/04/18 开始并完成编写 Settings 
+  2022/05/02 用户登陆系统
 */
 
 //无线AP名称Teacher WiFi
@@ -41,9 +42,9 @@ void setup() {
   tft.init();
   tft.fillScreen(TFT_BLACK);
   tft.setRotation(1);
-  tft.setTextSize(3);
+  tft.setTextSize(1);
   tft.setTextColor(TFT_WHITE);
-  tft.setCursor(0, 0);
+  tft.setCursor(0, 0, 4);
   tft.setTextDatum(MC_DATUM);
   tft.setSwapBytes(true);
 
@@ -97,7 +98,7 @@ void setup() {
   */
   //  listDir(SD_MMC, "/", 10);
   tft.fillScreen(TFT_BLACK);
-  tft.setCursor(0, 0);
+  tft.setCursor(0, 0, 4);
 
   if (StartPrint){
     tft.println(readFileLine("/System/Users/Users.txt", 1));
@@ -107,6 +108,7 @@ void setup() {
 //  tft.println(readFileLine("/System/Settings/LastUser.txt", 1));
 //  tft.println(readFileLine("/User/SoTWild/Data/Others/password.txt", 1));
   }
+  Userlogin();/*
   if(readFileLine("/System/Settings/Initial interface.txt", 1) == String("true")){
     while (1) {
       if (touch.Pressed()) {
@@ -134,9 +136,8 @@ void setup() {
     Serial.print("User:");
     Serial.println(User);
     Signin();
-  }
+  }*/
 
-  tft.setCursor(0, 0, 1);
   line = 1;
   tft.fillScreen(TFT_BLACK);
   Userdir = String("/User/") + User + String("/Config");
@@ -144,6 +145,7 @@ void setup() {
   //  delay(5000);
   Refresh();
   tft.setTextColor(TFT_WHITE);
+  Serial.println(User);
 }
 
 void loop() {

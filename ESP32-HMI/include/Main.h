@@ -4,6 +4,179 @@
 
 #include "Media_Player.h"
 
+void UserCheck(int a){
+  tft.fillScreen(TFT_BLACK);
+  delay(100);
+  User = readFileLine("/System/Users/Users.txt", a);
+  drawSdJpeg("/System/Widgets/signinbkd.jpg", 0, 0);
+  jpgdir = String ("/User/") + User + String("/Data/Others/") + User + String(".jpg");
+  if (SD_MMC.exists(jpgdir.c_str())){
+    drawSdJpeg(jpgdir.c_str(), 40, 40);
+  }
+  else{
+    drawSdJpeg("/System/Widgets/user.jpg", 40, 40);
+  }
+  tft.setTextColor(TFT_BLACK);
+  tft.setCursor(40,200);
+  tft.print(User);
+  
+  drawSdJpeg("/System/Widgets/num_keyboard.jpg", 0, 270);
+  tft.fillRoundRect(220,70, 220, 50, 8, TFT_WHITE);
+  tft.setCursor(225, 40, 4);
+  tft.setTextSize(1);
+  tft.print("Password:");
+  while (1) {
+    tft.setCursor(225, 85);
+    tft.print(password);
+    if (touch.Pressed()) {
+      delay(300);
+      if ( 0 < touch.X() && touch.X() < 40 ) {
+        password = password + String("0");
+      }
+      else if ( 40 < touch.X() && touch.X() < 80 ) {
+        password = password + String("1");
+      }
+      else if ( 80 < touch.X() && touch.X() < 120 ) {
+        password = password + String("2");
+      }
+      else if ( 120 < touch.X() && touch.X() < 160 ) {
+        password = password + String("3");
+      }
+      else if ( 160 < touch.X() && touch.X() < 200 ) {
+        password = password + String("4");
+      }
+      else if ( 200 < touch.X() && touch.X() < 240 ) {
+        password = password + String("5");
+      }
+      else if ( 240 < touch.X() && touch.X() < 280 ) {
+        password = password + String("6");
+      }
+      else if ( 280 < touch.X() && touch.X() < 320 ) {
+        password = password + String("7");
+      }
+      else if ( 320 < touch.X() && touch.X() < 360 ) {
+        password = password + String("8");
+      }
+      else if ( 360 < touch.X() && touch.X() < 400 ) {
+        password = password + String("9");
+      }
+      else if ( 400 < touch.X()) {
+        filedir = String ("/User/") + User + String("/Config/") + String("password.txt");
+        if (password == readFileLine(filedir.c_str(), 1)){
+          tft.setCursor(225, 85);
+          tft.fillRoundRect(220,70, 220, 50, 8, TFT_WHITE);
+          tft.print("Welcome!");
+          Serial.println(password);
+          delay(1000);
+          break;
+        }
+        else{
+          tft.setCursor(225, 85);
+          tft.fillRoundRect(220,70, 220, 50, 8, TFT_WHITE);
+          tft.print("Wrong Password!");
+          Serial.println(password);
+          delay(1000);
+          password = "";
+          UserCheck(b);
+        }
+      }
+    }
+  }
+}
+void listUser(int UserPage) {
+  Serial.println(UserPage);
+
+  int strlen = 0;
+  int a = 1;
+  
+  String filename;
+  String User_head_portrait;
+  
+  tft.fillScreen(tft.color565(214, 214, 214));
+  tft.fillRoundRect(10,270, 460, 40, 8, TFT_BLUE);
+  tft.setCursor(25, 280);
+  tft.setTextColor(TFT_ORANGE);
+  tft.print("Previous");
+  tft.print("                                                     ");
+  tft.print("Next");
+  tft.setTextColor(TFT_BLACK);
+
+  UserBline = (UserPage * 2) - 1;
+  UserEline = UserPage + 1;
+
+  strlen = strlen + 35;
+  Serial.printf("strlen: %d\n",strlen);
+
+  Serial.println(UserBline);
+  Serial.println(UserEline);
+  
+  while (UserBline <= UserEline) {
+    User = readFileLine("/System/Users/Users.txt", UserBline);
+    strlen = sizeof(User);
+    strlen = strlen + 23;
+    filedir = String ("/User/") + User + String("/Data/Others/") + User + String(".jpg");
+    User_head_portrait = filedir;
+    Serial.println(User_head_portrait);
+    if(a == 1) {
+      if (SD_MMC.exists(User_head_portrait.c_str())){
+        drawSdJpeg(User_head_portrait.c_str(),40,40);
+      }
+      else{
+        drawSdJpeg("/System/Widgets/user.jpg", 40, 40);
+      }
+      tft.setCursor(40,200);
+      tft.print(User);
+    }
+    else if(a == 2) {
+      if (SD_MMC.exists(User_head_portrait.c_str())){
+        drawSdJpeg(User_head_portrait.c_str(),290,40);
+      }
+      else{
+        drawSdJpeg("/System/Widgets/user.jpg", 290, 40);
+      }
+      tft.setCursor(290,200);
+      tft.print(User);
+    }
+    //Serial.println(a);
+    UserBline++;
+    a++;
+  }
+}
+void Userlogin(){
+  listUser(UserPage);
+
+  while(1){
+    if(UserPage < 1){
+      UserPage = 1;
+      listUser(UserPage);
+    }
+    if (touch.Pressed()) {
+      if ((20 < touch.X()) && (touch.X() < 200) && (280 < touch.Y()) && (touch.Y() < 320)) {
+        UserPage--;
+        listUser(UserPage);
+      }
+      else if ((280 < touch.X()) && (touch.X() < 480) && (280 < touch.Y()) && (touch.Y() < 320)) {
+        UserPage++;
+        listUser(UserPage);
+      }
+      else if ((40 < touch.X()) && (touch.X() < 190) && (40 < touch.Y()) && (touch.Y() < 190)){
+        b = (UserPage * 2) - 1;
+        UserCheck(b);
+        break;
+      }
+      else if ((290 < touch.X()) && (touch.X() < 440) && (40 < touch.Y()) && (touch.Y() < 190)){
+        b = UserPage * 2;
+        UserCheck(b);
+        break;
+      }
+    }
+    if (EnableUC == 1){
+      EnableUC = 0;
+      listUser(UserPage);
+    }
+  }
+}
+
 void Refresh() {
   Userdir = String("/User/") + User + String("/Data/Music/MusicData/AlbumArtSmall.jpg");
   SD_MMC.remove(Userdir.c_str());
