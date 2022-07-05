@@ -11,6 +11,9 @@ String MusicName;
 String MusicState = "List Loop";
 String VideoName;
 String BookName;
+String str_CalNum1;
+String str_CalNum2;
+
 int MS_num;
 int Musicnum = 1;
 int Music_num = 1;
@@ -35,6 +38,15 @@ int EnableUC = 0;
 int UserBline;
 int UserEline;
 int b;
+int decimal_point = 0;
+int inputNum = 1;
+int Operation_mode = 1;//1-add 2-subtract 3-multiply 4-divide
+int Cal_negative = 0;//判断是否已经输入负数
+int Operation_mode_change = 0;
+
+float CalNum1 = 0;
+float CalNum2 = 0;
+float CalResult = 0;
 
 bool notice;
 String n_otice;
@@ -383,7 +395,7 @@ int state = 0;
 void THMini() {
   tft.setRotation(0);
   touch.setRotation(2);
-  tft.setTextSize(2);
+  tft.setTextSize(1);
   tft.setTextColor(TFT_MAGENTA);
   tft.setCursor(0, 0);
   tft.setTextDatum(MC_DATUM);
@@ -401,7 +413,7 @@ void THMini() {
       tft.print("score:");
       tft.setCursor(5, 25);
       tft.print(score);
-      while (0 == 0) {
+      while (1) {
         if (touch.Pressed()) {
           //tft.fillRect(127,y - spd,64,64,TFT_WHITE);
           Userdir = String ("/User/") + User + String("/Data/Game/TouHou/Mini/image/background.jpg");

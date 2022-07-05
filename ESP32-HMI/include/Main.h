@@ -428,7 +428,7 @@ void listMusic(int MusicPage){
     //Serial.println(MusicBline);
   }
   tft.setTextColor(TFT_BLACK);
-} 
+}
 void MusicSet(){
   tft.fillRoundRect(350,0, 140, 320, 8, tft.color565(230, 230, 230));
   drawSdJpeg("/System/APP/Sounder/List Loop.jpg", 360, 10);
@@ -638,15 +638,23 @@ void listVideo(int VideoPage){
     //tft.println(VideoCover);
     if(a == 1) {
       drawSdJpeg(VideoCover.c_str(),40,20);
+      //tft.setCursor(40,130);
+      //tft.print(VideoName);
     }
     else if(a == 2) {
       drawSdJpeg(VideoCover.c_str(),260,20);
+      //tft.setCursor(260,130);
+      //tft.print(VideoName);
     }
     else if(a == 3) {
       drawSdJpeg(VideoCover.c_str(),40,160);
+      //tft.setCursor(40,270);
+      //tft.print(VideoName);
     }
     else {
       drawSdJpeg(VideoCover.c_str(),260,160);
+      //tft.setCursor(260,270);
+      //tft.print(VideoName);
     }
     //Serial.println(a);
     VideoBline = VideoBline + 2;
@@ -1017,6 +1025,358 @@ void Settings(){
   }
 }
 
+//Calculator
+void Calculator(){
+  Serial.print(strlen(str_CalNum1.c_str()));
+  tft.setRotation(0);
+  tft.setTextColor(TFT_WHITE);
+  tft.setTextSize(1);
+  touch.setRotation(2);
+  drawSdJpeg("/System/Widgets/Calculator_kb.jpg", 0, 0);
+  tft.setCursor(190,129);
+  tft.print("Back|Clear");
+  tft.setCursor(5,5);
+
+  str_CalNum1 = "";
+  str_CalNum2 = "";
+  decimal_point = 0;
+  inputNum = 1;
+  Operation_mode = 1;
+  CalNum1 = 0;
+  CalNum2 = 0;
+  CalResult = 0;
+  Cal_negative = 0;
+  Operation_mode_change = 0;
+
+  while (1){
+    if (touch.Pressed()) {
+      X_Coord = touch.X();
+      Y_Coord = touch.Y();
+      if (0 < X_Coord && X_Coord < 80 && 160 < Y_Coord && Y_Coord < 240) {
+        if (inputNum == 1){
+          str_CalNum1 = str_CalNum1 + "1";
+        }
+        else {
+          str_CalNum2 = str_CalNum2 + "1";
+        }
+        if (inputNum == 1){
+          tft.setCursor(5,5);
+          tft.print(str_CalNum1);
+        }
+        else {
+          tft.setCursor(5,30);
+          tft.print(str_CalNum2);
+        }
+      }
+      else if (80 < X_Coord && X_Coord < 160 && 160 < Y_Coord && Y_Coord < 240) {
+        if (inputNum == 1){
+          str_CalNum1 = str_CalNum1 + "2";
+        }
+        else {
+          str_CalNum2 = str_CalNum2 + "2";
+        }
+        if (inputNum == 1){
+          tft.setCursor(5,5);
+          tft.print(str_CalNum1);
+        }
+        else {
+          tft.setCursor(5,30);
+          tft.print(str_CalNum2);
+        }
+      }
+      else if (160 < X_Coord && X_Coord < 240 && 160 < Y_Coord && Y_Coord < 240) {
+        if (inputNum == 1){
+          str_CalNum1 = str_CalNum1 + "3";
+        }
+        else {
+          str_CalNum2 = str_CalNum2 + "3";
+        }
+        if (inputNum == 1){
+          tft.setCursor(5,5);
+          tft.print(str_CalNum1);
+        }
+        else {
+          tft.setCursor(5,30);
+          tft.print(str_CalNum2);
+        }
+      }
+      else if (240 < X_Coord && X_Coord < 320 && 160 < Y_Coord && Y_Coord < 240) {// /
+        inputNum = 2;
+        decimal_point = 0;
+        Operation_mode = 4;
+        Operation_mode_change = 1;
+        tft.fillRect(240,0,35,50,tft.color565(54, 68, 79));
+        tft.setCursor(240,0);
+        tft.setTextSize(2);
+        tft.setTextColor(tft.color565(255, 255, 0));
+        tft.print("/");
+        tft.setCursor(5,30);
+        tft.setTextSize(1);
+        tft.setTextColor(TFT_WHITE);
+      }
+      else if (0 < X_Coord && X_Coord < 80 && 240 < Y_Coord && Y_Coord < 320) {
+        if (inputNum == 1){
+          str_CalNum1 = str_CalNum1 + "4";
+        }
+        else {
+          str_CalNum2 = str_CalNum2 + "4";
+        }
+        if (inputNum == 1){
+          tft.setCursor(5,5);
+          tft.print(str_CalNum1);
+        }
+        else {
+          tft.setCursor(5,30);
+          tft.print(str_CalNum2);
+        }
+      }
+      else if (80 < X_Coord && X_Coord < 160 && 240 < Y_Coord && Y_Coord < 320) {
+        if (inputNum == 1){
+          str_CalNum1 = str_CalNum1 + "5";
+        }
+        else {
+          str_CalNum2 = str_CalNum2 + "5";
+        }
+        if (inputNum == 1){
+          tft.setCursor(5,5);
+          tft.print(str_CalNum1);
+        }
+        else {
+          tft.setCursor(5,30);
+          tft.print(str_CalNum2);
+        }
+      }
+      else if (160 < X_Coord && X_Coord < 240 && 240 < Y_Coord && Y_Coord < 320) {
+        if (inputNum == 1){
+          str_CalNum1 = str_CalNum1 + "6";
+        }
+        else {
+          str_CalNum2 = str_CalNum2 + "6";
+        }
+        if (inputNum == 1){
+          tft.setCursor(5,5);
+          tft.print(str_CalNum1);
+        }
+        else {
+          tft.setCursor(5,30);
+          tft.print(str_CalNum2);
+        }
+      }
+      else if (240 < X_Coord && X_Coord < 320 && 240 < Y_Coord && Y_Coord < 320) {// *
+        inputNum = 2;
+        decimal_point = 0;
+        Operation_mode = 3;
+        Operation_mode_change = 1;
+        tft.fillRect(240,0,35,50,tft.color565(54, 68, 79));
+        tft.setCursor(240,0);
+        tft.setTextSize(2);
+        tft.setTextColor(tft.color565(255, 255, 0));
+        tft.print("x");
+        tft.setCursor(5,30);
+        tft.setTextSize(1);
+        tft.setTextColor(TFT_WHITE);
+      }
+      else if (0 < X_Coord && X_Coord < 80 && 320 < Y_Coord && Y_Coord < 400) {
+        if (inputNum == 1){
+          str_CalNum1 = str_CalNum1 + "7";
+        }
+        else {
+          str_CalNum2 = str_CalNum2 + "7";
+        }
+        if (inputNum == 1){
+          tft.setCursor(5,5);
+          tft.print(str_CalNum1);
+        }
+        else {
+          tft.setCursor(5,30);
+          tft.print(str_CalNum2);
+        }
+      }
+      else if (80 < X_Coord && X_Coord < 160 && 320 < Y_Coord && Y_Coord < 400) {
+        if (inputNum == 1){
+          str_CalNum1 = str_CalNum1 + "8";
+        }
+        else {
+          str_CalNum2 = str_CalNum2 + "8";
+        }
+        if (inputNum == 1){
+          tft.setCursor(5,5);
+          tft.print(str_CalNum1);
+        }
+        else {
+          tft.setCursor(5,30);
+          tft.print(str_CalNum2);
+        }
+      }
+      else if (160 < X_Coord && X_Coord < 240 && 320 < Y_Coord && Y_Coord < 400) {
+        if (inputNum == 1){
+          str_CalNum1 = str_CalNum1 + "9";
+        }
+        else {
+          str_CalNum2 = str_CalNum2 + "9";
+        }
+        if (inputNum == 1){
+          tft.setCursor(5,5);
+          tft.print(str_CalNum1);
+        }
+        else {
+          tft.setCursor(5,30);
+          tft.print(str_CalNum2);
+        }
+      }
+      else if (240 < X_Coord && X_Coord < 320 && 320 < Y_Coord && Y_Coord < 400) {// -
+        if(strlen(str_CalNum1.c_str()) == 0){
+          str_CalNum1 = str_CalNum1 + "-";
+          tft.setCursor(5,5);
+          tft.print(str_CalNum1);
+        }
+        else if (strlen(str_CalNum2.c_str()) == 0){
+          if (Cal_negative == 0) {
+            inputNum = 2;
+            decimal_point = 0;
+            Operation_mode = 2;
+            Operation_mode_change = 1;
+            tft.fillRect(240,0,35,50,tft.color565(54, 68, 79));
+            tft.setCursor(240,0);
+            tft.setTextSize(2);
+            tft.setTextColor(tft.color565(255, 255, 0));
+            tft.print("-");
+            tft.setCursor(5,30);
+            tft.setTextSize(1);
+            tft.setTextColor(TFT_WHITE);
+            Cal_negative = 1;
+          }
+          else if (Operation_mode_change == 1) {
+            str_CalNum2 = str_CalNum2 + "-";
+            tft.setCursor(5,30);
+            tft.print(str_CalNum2);
+          }
+        }
+      }
+      else if (0 < X_Coord && X_Coord < 80 && 400 < Y_Coord && Y_Coord < 480) {
+        if (inputNum == 1){
+          str_CalNum1 = str_CalNum1 + "0";
+        }
+        else {
+          str_CalNum2 = str_CalNum2 + "0";
+        }
+        if (inputNum == 1){
+          tft.setCursor(5,5);
+          tft.print(str_CalNum1);
+        }
+        else {
+          tft.setCursor(5,30);
+          tft.print(str_CalNum2);
+        }
+      }
+      else if (80 < X_Coord && X_Coord < 160 && 400 < Y_Coord && Y_Coord < 480) {
+        if (decimal_point == 0){
+          if (inputNum == 1){
+            str_CalNum1 = str_CalNum1 + ".";
+          }
+          else {
+            str_CalNum2 = str_CalNum2 + ".";
+          }
+          decimal_point = 1;
+        }
+        if (inputNum == 1){
+          tft.setCursor(5,5);
+          tft.print(str_CalNum1);
+        }
+        else {
+          tft.setCursor(5,30);
+          tft.print(str_CalNum2);
+        }
+      }
+      else if (160 < X_Coord && X_Coord < 240 && 400 < Y_Coord && Y_Coord < 480) {// =
+        CalNum1 = str_CalNum1.toFloat();
+        CalNum2 = str_CalNum2.toFloat();
+        tft.setTextColor(tft.color565(100, 255, 100));
+        tft.setTextSize(2);
+        tft.setCursor(5,60);
+        tft.print("=");
+        if (Operation_mode == 1){
+          CalResult = CalNum1 + CalNum2;
+          tft.printf("%.5f",CalResult);
+        }
+        else if (Operation_mode == 2){
+          CalResult = CalNum1 - CalNum2;
+          tft.printf("%.5f",CalResult);
+        }
+        else if (Operation_mode == 3){
+          CalResult = CalNum1 * CalNum2;
+          tft.printf("%.5f",CalResult);
+        }
+        else {
+          CalResult = CalNum1 / CalNum2;
+          tft.printf("%.5f",CalResult);
+        }
+      }
+      else if (240 < X_Coord && X_Coord < 320 && 400 < Y_Coord && Y_Coord < 480) {// +
+        inputNum = 2;
+        decimal_point = 0;
+        Operation_mode = 1;
+        Operation_mode_change = 1;
+        tft.fillRect(240,0,35,50,tft.color565(54, 68, 79));
+        tft.setCursor(240,0);
+        tft.setTextSize(2);
+        tft.setTextColor(tft.color565(255, 255, 0));
+        tft.print("+");
+        tft.setCursor(5,30);
+        tft.setTextSize(1);
+        tft.setTextColor(TFT_WHITE);
+      }
+      else if (270 < X_Coord && X_Coord < 320 && 0 < Y_Coord && Y_Coord < 80) {// f(x)
+        
+      }
+      else if (255 < X_Coord && X_Coord < 320 && 100 < Y_Coord && Y_Coord < 140) {// C
+        tft.setTextColor(TFT_WHITE);
+        tft.setTextSize(1);
+        touch.setRotation(2);
+        drawSdJpeg("/System/Widgets/Calculator_kb.jpg", 0, 0);
+        tft.setCursor(255,130);
+        tft.print("Clear");
+        tft.setCursor(5,5);
+
+        str_CalNum1 = "";
+        str_CalNum2 = "";
+        decimal_point = 0;
+        inputNum = 1;
+        Operation_mode = 1;
+        CalNum1 = 0;
+        CalNum2 = 0;
+        CalResult = 0;
+        Cal_negative = 0;
+        Operation_mode_change = 0;
+      }
+      else if (190 < X_Coord && X_Coord < 255 && 100 < Y_Coord && Y_Coord < 140) {//Back
+        if(inputNum == 1){
+          tft.setCursor(5,5);
+          tft.setTextColor(tft.color565(54, 68, 79));
+          tft.print(str_CalNum1);
+          str_CalNum1 = str_CalNum1.substring(0,str_CalNum1.length() - 1);
+          tft.setCursor(5,5);
+          tft.setTextColor(TFT_WHITE);
+          tft.print(str_CalNum1);
+        }
+        else {
+          tft.setCursor(5,30);
+          tft.setTextColor(tft.color565(54, 68, 79));
+          tft.print(str_CalNum2);
+          str_CalNum2 = str_CalNum2.substring(0,str_CalNum2.length() - 1);
+          tft.setCursor(5,30);
+          tft.setTextColor(TFT_WHITE);
+          tft.print(str_CalNum2);
+        }
+      }
+      else if (0 < X_Coord && X_Coord < 20 && 0 < Y_Coord && Y_Coord < 20) {
+        break;
+      }
+      delay(200);
+    }
+  }
+}
+
 void MainPage() {
   tft.setCursor(0, 300, 4);
 
@@ -1048,6 +1408,8 @@ void MainPage() {
         drawSdJpeg("/System/APP/Player/Player.jpg", 25, 145);
         drawSdJpeg("/System/APP/Album/Album.jpg", 115, 145);
         drawSdJpeg("/System/APP/Settings/Settings.jpg", 205, 145);
+        drawSdJpeg("/System/APP/Calculator/Calculator.jpg", 295, 145);
+
         while(1){
           if (touch.Pressed()) {
             X_Coord = touch.X();
@@ -1087,6 +1449,11 @@ void MainPage() {
                 tft.fillScreen(TFT_BLACK);
                 delay(100);
                 Settings();
+              }
+              else if (295 < X_Coord && X_Coord < 375 && 145 < Y_Coord && Y_Coord < 225){
+                tft.fillScreen(TFT_BLACK);
+                delay(100);
+                Calculator();
               }
             }
             else {

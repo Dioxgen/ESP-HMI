@@ -19,6 +19,7 @@
   2022/04/17 完善 Ebook
   2022/04/18 开始并完成编写 Settings 
   2022/05/02 用户登陆系统
+  2022/07/05 计算器（普通）
 */
 
 //无线AP名称Teacher WiFi
@@ -30,7 +31,7 @@
 
 #define TFT_BL 19
 #define TFT_BRIGHTNESS 255
-#define StartPrint 0
+#define StartPrint 1
 
 void setup() {
 
@@ -77,6 +78,7 @@ void setup() {
       tft.printf("SD.totalBytes = %lluMB \n", SD_MMC.totalBytes() / (1024 * 1024));
       tft.printf("SD.usedBytes = %lluMB \n", SD_MMC.usedBytes() / (1024 * 1024));
       tft.printf("SD.cardType = %d \r\n", SD_MMC.cardType());
+      delay(2000);
     }
   }
   /*
