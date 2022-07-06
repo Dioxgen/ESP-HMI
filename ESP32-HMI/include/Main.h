@@ -1027,14 +1027,13 @@ void Settings(){
 
 //Calculator
 void Calculator(){
-  Serial.print(strlen(str_CalNum1.c_str()));
   tft.setRotation(0);
   tft.setTextColor(TFT_WHITE);
   tft.setTextSize(1);
   touch.setRotation(2);
   drawSdJpeg("/System/Widgets/Calculator_kb.jpg", 0, 0);
-  tft.setCursor(190,129);
-  tft.print("Back|Clear");
+  tft.setCursor(185,125);
+  tft.print("Back / Clear");
   tft.setCursor(5,5);
 
   str_CalNum1 = "";
@@ -1101,18 +1100,20 @@ void Calculator(){
         }
       }
       else if (240 < X_Coord && X_Coord < 320 && 160 < Y_Coord && Y_Coord < 240) {// /
-        inputNum = 2;
-        decimal_point = 0;
-        Operation_mode = 4;
-        Operation_mode_change = 1;
-        tft.fillRect(240,0,35,50,tft.color565(54, 68, 79));
-        tft.setCursor(240,0);
-        tft.setTextSize(2);
-        tft.setTextColor(tft.color565(255, 255, 0));
-        tft.print("/");
-        tft.setCursor(5,30);
-        tft.setTextSize(1);
-        tft.setTextColor(TFT_WHITE);
+        if (Operation_mode_change == 0) {
+          inputNum = 2;
+          decimal_point = 0;
+          Operation_mode = 4;
+          Operation_mode_change = 1;
+          tft.fillRect(240,0,35,50,tft.color565(54, 68, 79));
+          tft.setCursor(240,0);
+          tft.setTextSize(2);
+          tft.setTextColor(tft.color565(255, 255, 0));
+          tft.print("/");
+          tft.setCursor(5,30);
+          tft.setTextSize(1);
+          tft.setTextColor(TFT_WHITE);
+        }
       }
       else if (0 < X_Coord && X_Coord < 80 && 240 < Y_Coord && Y_Coord < 320) {
         if (inputNum == 1){
@@ -1163,18 +1164,20 @@ void Calculator(){
         }
       }
       else if (240 < X_Coord && X_Coord < 320 && 240 < Y_Coord && Y_Coord < 320) {// *
-        inputNum = 2;
-        decimal_point = 0;
-        Operation_mode = 3;
-        Operation_mode_change = 1;
-        tft.fillRect(240,0,35,50,tft.color565(54, 68, 79));
-        tft.setCursor(240,0);
-        tft.setTextSize(2);
-        tft.setTextColor(tft.color565(255, 255, 0));
-        tft.print("x");
-        tft.setCursor(5,30);
-        tft.setTextSize(1);
-        tft.setTextColor(TFT_WHITE);
+        if (Operation_mode_change == 0) {
+          inputNum = 2;
+          decimal_point = 0;
+          Operation_mode = 3;
+          Operation_mode_change = 1;
+          tft.fillRect(240,0,35,50,tft.color565(54, 68, 79));
+          tft.setCursor(240,0);
+          tft.setTextSize(2);
+          tft.setTextColor(tft.color565(255, 255, 0));
+          tft.print("x");
+          tft.setCursor(5,30);
+          tft.setTextSize(1);
+          tft.setTextColor(TFT_WHITE);
+        }
       }
       else if (0 < X_Coord && X_Coord < 80 && 320 < Y_Coord && Y_Coord < 400) {
         if (inputNum == 1){
@@ -1225,32 +1228,29 @@ void Calculator(){
         }
       }
       else if (240 < X_Coord && X_Coord < 320 && 320 < Y_Coord && Y_Coord < 400) {// -
-        if(strlen(str_CalNum1.c_str()) == 0){
+        if (strlen(str_CalNum1.c_str()) == 0 && Operation_mode_change == 0){
           str_CalNum1 = str_CalNum1 + "-";
           tft.setCursor(5,5);
           tft.print(str_CalNum1);
         }
-        else if (strlen(str_CalNum2.c_str()) == 0){
-          if (Cal_negative == 0) {
-            inputNum = 2;
-            decimal_point = 0;
-            Operation_mode = 2;
-            Operation_mode_change = 1;
-            tft.fillRect(240,0,35,50,tft.color565(54, 68, 79));
-            tft.setCursor(240,0);
-            tft.setTextSize(2);
-            tft.setTextColor(tft.color565(255, 255, 0));
-            tft.print("-");
-            tft.setCursor(5,30);
-            tft.setTextSize(1);
-            tft.setTextColor(TFT_WHITE);
-            Cal_negative = 1;
-          }
-          else if (Operation_mode_change == 1) {
-            str_CalNum2 = str_CalNum2 + "-";
-            tft.setCursor(5,30);
-            tft.print(str_CalNum2);
-          }
+        else if (strlen(str_CalNum1.c_str()) != 0 && Operation_mode_change == 0) {
+          inputNum = 2;
+          decimal_point = 0;
+          Operation_mode = 2;
+          Operation_mode_change = 1;
+          tft.fillRect(240,0,35,50,tft.color565(54, 68, 79));
+          tft.setCursor(240,0);
+          tft.setTextSize(2);
+          tft.setTextColor(tft.color565(255, 255, 0));
+          tft.print("-");
+          tft.setCursor(5,30);
+          tft.setTextSize(1);
+          tft.setTextColor(TFT_WHITE);
+        }
+        else if (strlen(str_CalNum2.c_str()) == 0 && Operation_mode_change == 1){
+          str_CalNum2 = str_CalNum2 + "-";
+          tft.setCursor(5,30);
+          tft.print(str_CalNum2);
         }
       }
       else if (0 < X_Coord && X_Coord < 80 && 400 < Y_Coord && Y_Coord < 480) {
@@ -1313,29 +1313,59 @@ void Calculator(){
         }
       }
       else if (240 < X_Coord && X_Coord < 320 && 400 < Y_Coord && Y_Coord < 480) {// +
-        inputNum = 2;
-        decimal_point = 0;
-        Operation_mode = 1;
-        Operation_mode_change = 1;
-        tft.fillRect(240,0,35,50,tft.color565(54, 68, 79));
-        tft.setCursor(240,0);
-        tft.setTextSize(2);
-        tft.setTextColor(tft.color565(255, 255, 0));
-        tft.print("+");
-        tft.setCursor(5,30);
-        tft.setTextSize(1);
-        tft.setTextColor(TFT_WHITE);
+        if (Operation_mode_change == 0) {
+          inputNum = 2;
+          decimal_point = 0;
+          Operation_mode = 1;
+          Operation_mode_change = 1;
+          tft.fillRect(240,0,35,50,tft.color565(54, 68, 79));
+          tft.setCursor(240,0);
+          tft.setTextSize(2);
+          tft.setTextColor(tft.color565(255, 255, 0));
+          tft.print("+");
+          tft.setCursor(5,30);
+          tft.setTextSize(1);
+          tft.setTextColor(TFT_WHITE);
+        }
       }
       else if (270 < X_Coord && X_Coord < 320 && 0 < Y_Coord && Y_Coord < 80) {// f(x)
-        
+        tft.fillScreen(TFT_BLACK);
+        tft.setRotation(1);
+        tft.setTextSize(1);
+        tft.setTextColor(TFT_WHITE);
+        tft.setCursor(1, 270);
+        touch.setRotation(3);
+
+        drawSdJpeg("/System/Widgets/Coordinate_axis.jpg", 0, 0);
+        tft.fillCircle(20,280,20,TFT_ORANGE);
+        tft.print("+");
+
+        while(1) {
+          if (touch.Pressed()) {
+            X_Coord = touch.X();
+            Y_Coord = touch.Y();
+            if (0 < X_Coord && X_Coord < 40 && 300 < Y_Coord && Y_Coord < 280) {
+              drawSdJpeg("/System/Widgets/Select_function.jpg", 0, 0);
+              while(1) {
+                if (touch.Pressed()) {
+                  X_Coord = touch.X();
+                  Y_Coord = touch.Y();
+                  if (0 < X_Coord && X_Coord < 40 && 300 < Y_Coord && Y_Coord < 280) {
+
+                  }
+                }
+              }
+            }
+          }
+        }
       }
       else if (255 < X_Coord && X_Coord < 320 && 100 < Y_Coord && Y_Coord < 140) {// C
         tft.setTextColor(TFT_WHITE);
         tft.setTextSize(1);
         touch.setRotation(2);
         drawSdJpeg("/System/Widgets/Calculator_kb.jpg", 0, 0);
-        tft.setCursor(255,130);
-        tft.print("Clear");
+        tft.setCursor(185,125);
+        tft.print("Back / Clear");
         tft.setCursor(5,5);
 
         str_CalNum1 = "";
@@ -1369,10 +1399,12 @@ void Calculator(){
           tft.print(str_CalNum2);
         }
       }
-      else if (0 < X_Coord && X_Coord < 20 && 0 < Y_Coord && Y_Coord < 20) {
+      else if (0 < X_Coord && X_Coord < 30 && 0 < Y_Coord && Y_Coord < 30) {
+        tft.setRotation(1);
+        touch.setRotation(3);
         break;
       }
-      delay(200);
+      delay(250);
     }
   }
 }

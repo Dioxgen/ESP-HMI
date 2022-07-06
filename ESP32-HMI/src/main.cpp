@@ -68,15 +68,15 @@ void setup() {
   }
   else {
     Serial.println("SD card Ready!");
-    Serial.printf("SD.cardSize = %lluMB \n", SD_MMC.cardSize() / (1024 * 1024));
-    Serial.printf("SD.totalBytes = %lluMB \n", SD_MMC.totalBytes() / (1024 * 1024));
-    Serial.printf("SD.usedBytes = %lluMB \n", SD_MMC.usedBytes() / (1024 * 1024));
+    Serial.printf("SD.cardSize = %lluGB \n", SD_MMC.cardSize() / (1024 * 1024 * 1024));
+    Serial.printf("SD.totalBytes = %lluGB \n", SD_MMC.totalBytes() / (1024 * 1024 * 1024));
+    Serial.printf("SD.usedBytes = %lluGB \n", SD_MMC.usedBytes() / (1024 * 1024 * 1024));
     Serial.printf("SD.cardType = %d \r\n", SD_MMC.cardType());
     if (StartPrint){
       tft.println("SD card Ready!");
-      tft.printf("SD.cardSize = %lluMB \n", SD_MMC.cardSize() / (1024 * 1024));
-      tft.printf("SD.totalBytes = %lluMB \n", SD_MMC.totalBytes() / (1024 * 1024));
-      tft.printf("SD.usedBytes = %lluMB \n", SD_MMC.usedBytes() / (1024 * 1024));
+      tft.printf("SD.cardSize = %lluGB \n", SD_MMC.cardSize() / (1024 * 1024 * 1024));
+      tft.printf("SD.totalBytes = %lluGB \n", SD_MMC.totalBytes() / (1024 * 1024 * 1024));
+      tft.printf("SD.usedBytes = %lluGB \n", SD_MMC.usedBytes() / (1024 * 1024 * 1024));
       tft.printf("SD.cardType = %d \r\n", SD_MMC.cardType());
       delay(2000);
     }
