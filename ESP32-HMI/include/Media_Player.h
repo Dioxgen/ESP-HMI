@@ -14,6 +14,7 @@ String BookName;
 String str_CalNum1;
 String str_CalNum2;
 
+int Mainpage = 1;
 int MS_num;
 int Musicnum = 1;
 int Music_num = 1;
@@ -766,3 +767,26 @@ void CreatCrollWords(int IWIDTH,int pos, int IHEIGHT, int WAIT, int X, int Y,int
     img.deleteSprite();
   }
 }*/
+
+//Thermometer
+#include <SHT3x.h>
+SHT3x Sensor;
+
+float Temperature = 0;
+float Humidity = 0;
+float H_Coordinate = 0;
+float CurveX = 11;
+int T_coordinate = 0;
+int H_coordinate = 0;
+
+void GetfromMometer(){
+  Sensor.Begin();
+  Sensor.UpdateData();
+  Serial.print("Temperature: ");
+  Serial.print(Sensor.GetTemperature());
+  Serial.write("\xC2\xB0"); //°
+  Serial.println("C");
+  Serial.print("Humidity: ");
+  Serial.print(Sensor.GetRelHumidity());
+  Serial.println("%");
+}

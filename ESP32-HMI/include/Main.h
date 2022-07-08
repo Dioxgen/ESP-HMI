@@ -1409,6 +1409,116 @@ void Calculator(){
   }
 }
 
+//Thermometer
+void DrawDataCurve(){
+  T_coordinate = Temperature / 1;
+  T_coordinate = T_coordinate * 4;
+  T_coordinate = 280 - T_coordinate;
+
+  H_Coordinate = Humidity / 1;
+  H_Coordinate = H_Coordinate * 2.4;
+  H_Coordinate = 320 - H_Coordinate;
+  H_coordinate = H_Coordinate / 1;
+
+  tft.drawPixel(CurveX,T_coordinate,TFT_GREEN);
+  tft.drawPixel(CurveX,H_coordinate,TFT_RED);
+  if (CurveX > 480) {
+    tft.fillRect(0,80,480,320,TFT_BLACK);
+    tft.drawFastHLine(0,280,480,TFT_WHITE);
+    tft.drawFastVLine(10,80,240,TFT_WHITE);
+    CurveX = 11;
+  }
+  else {
+    CurveX = CurveX + 0.25;
+  }
+}
+void Thermometer(){
+  tft.setTextSize(1);
+  tft.drawFastHLine(0,280,480,TFT_WHITE);
+  tft.drawFastVLine(10,80,240,TFT_WHITE);
+  while(1) {
+    Sensor.UpdateData();
+    Temperature = Sensor.GetTemperature();
+    Humidity = Sensor.GetRelHumidity();
+
+    tft.setCursor(10,10);
+    tft.setTextColor(TFT_GREEN);
+    tft.print("Temperature: ");
+    if (-40 <= Temperature && Temperature <= 0) {
+      tft.setTextColor(tft.color565(255,239,213));
+    }
+    else if (0 <= Temperature && Temperature <= 18) {
+      tft.setTextColor(tft.color565(105,105,105));
+    }
+    else if (18 <= Temperature && Temperature <= 26) {
+      tft.setTextColor(TFT_GREEN);
+    }
+    else if (26 <= Temperature && Temperature <= 35) {
+      tft.setTextColor(TFT_ORANGE);
+    }
+    else if (35 <= Temperature && Temperature <= 125) {
+      tft.setTextColor(TFT_RED);
+    }
+    tft.setCursor(170,10);
+    tft.print(Temperature);
+    tft.setTextColor(TFT_WHITE);
+    tft.setCursor(250,10);
+    tft.print(" '");
+    tft.println("C");
+
+    tft.setCursor(10,40);
+    tft.setTextColor(TFT_RED);
+    tft.print("Humidity: ");
+    if (0 <= Humidity && Humidity <= 40) {
+      tft.setTextColor(tft.color565(218,165,32));
+    }
+    else if (40 <= Humidity && Humidity <= 70) {
+      tft.setTextColor(TFT_GREEN);
+    }
+    else if (70 <= Humidity && Humidity <= 100) {
+      tft.setTextColor(tft.color565(135,206,250));
+    }
+    tft.setCursor(170,40);
+    tft.print(Humidity);
+    tft.setTextColor(TFT_WHITE);
+    tft.setCursor(250,40);
+    tft.println(" %");
+
+    DrawDataCurve();
+
+    delay(100);
+    tft.setCursor(170,10);
+    tft.setTextColor(TFT_BLACK);
+    tft.print(Temperature);
+    tft.setCursor(170,40);
+    tft.setTextColor(TFT_BLACK);
+    tft.print(Humidity);
+  }
+}
+
+void DrawAPP() {
+  tft.fillRect(0, 30, 400, 270, tft.color565(0, 0, 30));
+  tft.fillRoundRect(25,255,80,20,5,TFT_DARKGREY);
+  tft.fillRoundRect(295,255,80,20,5,TFT_DARKGREY);
+  if (Mainpage == 1) {
+    drawSdJpeg("/System/APP/Sounder/Sounder.jpg", 25, 55);
+    drawSdJpeg("/System/APP/Vision/Vision.jpg", 115, 55);
+    drawSdJpeg("/System/APP/Painter/Painter.jpg", 205, 55);
+    drawSdJpeg("/System/APP/Ebook/Ebook.jpg", 295, 55);
+    drawSdJpeg("/System/APP/Player/Player.jpg", 25, 145);
+    drawSdJpeg("/System/APP/Album/Album.jpg", 115, 145);
+    drawSdJpeg("/System/APP/Settings/Settings.jpg", 205, 145);
+    drawSdJpeg("/System/APP/Calculator/Calculator.jpg", 295, 145);
+    }
+  else if (Mainpage == 2) {
+    drawSdJpeg("/System/APP/Thermometer/Thermometer.jpg", 25, 55);
+  }
+  tft.setTextColor(TFT_WHITE);
+  tft.setCursor(40,255);
+  tft.print("<<<");
+  tft.setCursor(315,255);
+  tft.print(">>>");
+}
 void MainPage() {
   tft.setCursor(0, 300, 4);
 
@@ -1425,67 +1535,83 @@ void MainPage() {
   tft.setTextSize(1);
   tft.print("Start");
   tft.setTextColor(TFT_BLACK);
+
+  Serial.print("Pagenum:");
+  Serial.println(Mainpage);
   
   while (1){
     if (touch.Pressed()) {
       X_Coord = touch.X();
       Y_Coord = touch.Y();
       if     (X_Coord < 30 && 300 < Y_Coord) {
-        tft.fillRect(0, 30, 400, 270, tft.color565(0, 0, 30));
-        drawSdJpeg("/System/APP/Sounder/Sounder.jpg", 25, 55);
-        drawSdJpeg("/System/APP/Vision/Vision.jpg", 115, 55);
-        drawSdJpeg("/System/APP/Painter/Painter.jpg", 205, 55);
-        drawSdJpeg("/System/APP/Ebook/Ebook.jpg", 295, 55);
-        
-        drawSdJpeg("/System/APP/Player/Player.jpg", 25, 145);
-        drawSdJpeg("/System/APP/Album/Album.jpg", 115, 145);
-        drawSdJpeg("/System/APP/Settings/Settings.jpg", 205, 145);
-        drawSdJpeg("/System/APP/Calculator/Calculator.jpg", 295, 145);
-
+        DrawAPP();
         while(1){
           if (touch.Pressed()) {
             X_Coord = touch.X();
             Y_Coord = touch.Y();
             if (0 < X_Coord && X_Coord < 450 && 30 < Y_Coord && Y_Coord < 320) {
-              if (25 < X_Coord && X_Coord < 105 && 55 < Y_Coord && Y_Coord < 135) {
-                tft.fillScreen(TFT_BLACK);
-                delay(100);
-                Music();
+              if (25 < X_Coord && X_Coord < 105 && 255 < Y_Coord && Y_Coord < 275) {
+                Mainpage--;
+                if (Mainpage < 1) {
+                  Mainpage = 1;
+                }
+                DrawAPP();
               }
-              else if (115 < X_Coord && X_Coord < 195 && 55 < Y_Coord && Y_Coord < 135){
-                tft.fillScreen(TFT_BLACK);
-                delay(100);
-                Video();
+              else if (295 < X_Coord && X_Coord < 375 && 255 < Y_Coord && Y_Coord < 275) {
+                Mainpage++;
+                if (Mainpage > 2) {
+                  Mainpage = 2;
+                }
+                DrawAPP();
               }
-              else if (205 < X_Coord && X_Coord < 285 && 55 < Y_Coord && Y_Coord < 135){
-                tft.fillScreen(TFT_BLACK);
-                delay(100);
-                draw();
+              else if (Mainpage == 1) {
+                if (25 < X_Coord && X_Coord < 105 && 55 < Y_Coord && Y_Coord < 135) {
+                  tft.fillScreen(TFT_BLACK);
+                  delay(100);
+                  Music();
+                }
+                else if (115 < X_Coord && X_Coord < 195 && 55 < Y_Coord && Y_Coord < 135){
+                  tft.fillScreen(TFT_BLACK);
+                  delay(100);
+                  Video();
+                }
+                else if (205 < X_Coord && X_Coord < 285 && 55 < Y_Coord && Y_Coord < 135){
+                  tft.fillScreen(TFT_BLACK);
+                  delay(100);
+                  draw();
+                }
+                else if (295 < X_Coord && X_Coord < 375 && 55 < Y_Coord && Y_Coord < 135){
+                  tft.fillScreen(TFT_BLACK);
+                  delay(100);
+                  Ebook();
+                }
+                else if (25 < X_Coord && X_Coord < 105 && 145 < Y_Coord && Y_Coord < 225){
+                  tft.fillScreen(TFT_BLACK);
+                  delay(100);
+                  THMini();
+                }
+                else if (115 < X_Coord && X_Coord < 195 && 145 < Y_Coord && Y_Coord < 225){
+                  tft.fillScreen(TFT_BLACK);
+                  delay(100);
+                  Album();
+                }
+                else if (205 < X_Coord && X_Coord < 285 && 145 < Y_Coord && Y_Coord < 225){
+                  tft.fillScreen(TFT_BLACK);
+                  delay(100);
+                  Settings();
+                }
+                else if (295 < X_Coord && X_Coord < 375 && 145 < Y_Coord && Y_Coord < 225){
+                  tft.fillScreen(TFT_BLACK);
+                  delay(100);
+                  Calculator();
+                }
               }
-              else if (295 < X_Coord && X_Coord < 375 && 55 < Y_Coord && Y_Coord < 135){
-                tft.fillScreen(TFT_BLACK);
-                delay(100);
-                Ebook();
-              }
-              else if (25 < X_Coord && X_Coord < 105 && 145 < Y_Coord && Y_Coord < 225){
-                tft.fillScreen(TFT_BLACK);
-                delay(100);
-                THMini();
-              }
-              else if (115 < X_Coord && X_Coord < 195 && 145 < Y_Coord && Y_Coord < 225){
-                tft.fillScreen(TFT_BLACK);
-                delay(100);
-                Album();
-              }
-              else if (205 < X_Coord && X_Coord < 285 && 145 < Y_Coord && Y_Coord < 225){
-                tft.fillScreen(TFT_BLACK);
-                delay(100);
-                Settings();
-              }
-              else if (295 < X_Coord && X_Coord < 375 && 145 < Y_Coord && Y_Coord < 225){
-                tft.fillScreen(TFT_BLACK);
-                delay(100);
-                Calculator();
+              else if (Mainpage == 2) {
+                if (25 < X_Coord && X_Coord < 105 && 55 < Y_Coord && Y_Coord < 135) {
+                  tft.fillScreen(TFT_BLACK);
+                  delay(100);
+                  Thermometer();
+                }
               }
             }
             else {
