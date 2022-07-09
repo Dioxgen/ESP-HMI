@@ -226,22 +226,25 @@ void NewUser(fs::FS &fs, const char *UserName) {
 }
 
 void Album() {
-  jpgnum = 0;
+  jpgnum = 1;
   while (1) {
     if (touch.Pressed()) {
       tft.fillScreen(TFT_BLACK);
       if (touch.X() < 240 ) {
         jpgnum--;
+        if (jpgnum < 1) {
+          jpgnum = 1;
+        }
         jpgdir = String ("/User/") + User + String("/Data/Image/") + jpgnum + String(".jpg");
         drawSdJpeg(jpgdir.c_str(), 0, 0);
       }
-      else if (jpgnum++ < 1) {
-        break;
-      }
-      else {
+      else if (240 < touch.X() && touch.X() < 440) {
         jpgnum++;
         jpgdir = String ("/User/") + User + String("/Data/Image/") + jpgnum + String(".jpg");
         drawSdJpeg(jpgdir.c_str(), 0, 0);
+      }
+      else {
+        break;
       }
     }
   }
@@ -1487,19 +1490,26 @@ void Thermometer(){
     DrawDataCurve();
 
     delay(100);
+    
     tft.setCursor(170,10);
     tft.setTextColor(TFT_BLACK);
     tft.print(Temperature);
     tft.setCursor(170,40);
     tft.setTextColor(TFT_BLACK);
     tft.print(Humidity);
+
+    if (touch.Pressed()) {
+      X_Coord = touch.X();
+      Y_Coord = touch.Y();
+      if (450 < X_Coord && X_Coord < 480 && 0 < Y_Coord && Y_Coord < 30) {
+        break;
+      }
+    }
   }
 }
 
 void DrawAPP() {
   tft.fillRect(0, 30, 400, 270, tft.color565(0, 0, 30));
-  tft.fillRoundRect(25,255,80,20,5,TFT_DARKGREY);
-  tft.fillRoundRect(295,255,80,20,5,TFT_DARKGREY);
   if (Mainpage == 1) {
     drawSdJpeg("/System/APP/Sounder/Sounder.jpg", 25, 55);
     drawSdJpeg("/System/APP/Vision/Vision.jpg", 115, 55);
@@ -1513,6 +1523,8 @@ void DrawAPP() {
   else if (Mainpage == 2) {
     drawSdJpeg("/System/APP/Thermometer/Thermometer.jpg", 25, 55);
   }
+  tft.fillRoundRect(25,255,80,20,5,TFT_DARKGREY);
+  tft.fillRoundRect(295,255,80,20,5,TFT_DARKGREY);
   tft.setTextColor(TFT_WHITE);
   tft.setCursor(40,255);
   tft.print("<<<");
@@ -1530,7 +1542,7 @@ void MainPage() {
 //    drawSdJpeg("/System/Widgets/user.jpg", 40, 40);
     tft.fillScreen(TFT_DARKGREY);
   }
-  tft.fillRect(0, 300, 480, 20, tft.color565(0, 0, 50));
+  tft.fillRect(0, 300, 480, 20, tft.color565(0, 0, 0));
   tft.setTextColor(TFT_WHITE);
   tft.setTextSize(1);
   tft.print("Start");
