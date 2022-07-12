@@ -21,6 +21,7 @@
   2022/05/02 用户登陆系统
   2022/07/05 计算器（普通）
   2022/07/08 温度计
+  2022/07/12 文件上传
 */
 
 //无线AP名称Teacher WiFi
@@ -32,7 +33,7 @@
 
 #define TFT_BL 19
 #define TFT_BRIGHTNESS 255
-#define StartPrint 1
+#define StartPrint 0
 
 void setup() {
 
@@ -82,27 +83,32 @@ void setup() {
       delay(2000);
     }
   }
-  /*
-    File idfile = SD_MMC.open("/Data/id.txt");
-    File psfile = SD_MMC.open("/Data/ps.txt");
-    String ssid     = idfile.readString();
-    String password = psfile.readString();
-    idfile.close();
-    psfile.close();
-    Serial.print("Connecting to ");
-    Serial.println(ssid);
-    Serial.println(password);
-    WiFi.begin(ssid.c_str(), password.c_str());
-    while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
-    Serial.print(".");
-    }
-    Serial.println("WiFi connected.");
-  */
-  //  listDir(SD_MMC, "/", 10);
   tft.fillScreen(TFT_BLACK);
   tft.setCursor(0, 0, 4);
-
+  /*
+  IPAddress staticIP(192, 168, IPAD1, IPAD2);
+  IPAddress gateway(192, 168, 1, 1);
+  IPAddress subnet(255, 255, 255, 0);
+  IPAddress dns(8, 8, 8, 8);
+  WiFi.disconnect();
+  WiFi.config(staticIP, gateway, subnet, dns);
+  WiFi.mode(WIFI_STA);
+  wifiMulti.addAP("TP-LINK_6A56", "bobo512w999580");
+  wifiMulti.addAP("TP-LINK_6A56", "bobo512w999580");
+  Serial.println("Connecting ...");
+  while (wifiMulti.run() != WL_CONNECTED) {
+    delay(1000);
+    Serial.print(".");
+  }
+  Serial.print("Connected to ");
+  Serial.println(WiFi.SSID());
+  Serial.print("IP address:\t");
+  Serial.println(WiFi.localIP());
+  tft.print("Connected to ");
+  tft.println(WiFi.SSID());
+  tft.print("IP address:\t");
+  tft.println(WiFi.localIP());
+  */
   if (StartPrint){
     tft.println(readFileLine("/System/Users/Users.txt", 1));
     tft.println(readFileLine("/System/Users/Users.txt", 2));

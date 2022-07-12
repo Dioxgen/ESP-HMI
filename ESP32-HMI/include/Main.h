@@ -743,7 +743,7 @@ void EbookCheck(int booknum){
   filedir = String ("/User/") + User + String("/Config/EbookConfig.txt");
   PlayEbook(readFileLine(filedir.c_str(), booknum).c_str());
 }
-void listEbook(int BookPage) {
+void listEbook(int BookPage){
   Serial.println(BookPage);
 
   int strlen = 0;
@@ -1508,6 +1508,28 @@ void Thermometer(){
   }
 }
 
+//File_transfer
+void File_transfer(){
+  File_transfer_init();
+  while(1){
+    server.handleClient();
+
+    if (touch.Pressed()) {
+      X_Coord = touch.X();
+      Y_Coord = touch.Y();
+      if (450 < X_Coord && X_Coord < 480 && 0 < Y_Coord && Y_Coord < 30) {
+        WiFi.mode(WIFI_OFF);
+        break;
+      }
+    }
+  }
+}
+
+//Network
+void Network(){
+
+}
+
 void DrawAPP() {
   tft.fillRect(0, 30, 400, 270, tft.color565(0, 0, 30));
   if (Mainpage == 1) {
@@ -1522,6 +1544,8 @@ void DrawAPP() {
     }
   else if (Mainpage == 2) {
     drawSdJpeg("/System/APP/Thermometer/Thermometer.jpg", 25, 55);
+    drawSdJpeg("/System/APP/File_transfer/File_transfer.jpg", 115, 55);
+    drawSdJpeg("/System/APP/Network/Network.jpg", 205, 55);
   }
   tft.fillRoundRect(25,255,80,20,5,TFT_DARKGREY);
   tft.fillRoundRect(295,255,80,20,5,TFT_DARKGREY);
@@ -1623,6 +1647,16 @@ void MainPage() {
                   tft.fillScreen(TFT_BLACK);
                   delay(100);
                   Thermometer();
+                }
+                else if (115 < X_Coord && X_Coord < 195 && 55 < Y_Coord && Y_Coord < 135){
+                  tft.fillScreen(TFT_BLACK);
+                  delay(100);
+                  File_transfer();
+                }
+                else if (205 < X_Coord && X_Coord < 285 && 55 < Y_Coord && Y_Coord < 135){
+                  tft.fillScreen(TFT_BLACK);
+                  delay(100);
+                  Network();
                 }
               }
             }

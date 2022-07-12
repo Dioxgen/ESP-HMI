@@ -86,6 +86,7 @@ static int drawMCU(JPEGDRAW *pDraw) {
   return 1;
 }
 void Mjpeg_start(const char *MJPEG_FILENAME, const char *AUDIO_FILENAME) {
+  WiFi.mode(WIFI_OFF);
   gfx->fillScreen(TFT_BLACK);
   
   // Init Audio
@@ -256,6 +257,7 @@ void Mjpeg_start(const char *MJPEG_FILENAME, const char *AUDIO_FILENAME) {
             total_show_video = 0;
             EnableVC = 1;
             delay(1500);
+            WiFi.mode(WIFI_STA);
             gfx->fillScreen(TFT_BLACK);
           }
         }
@@ -789,4 +791,273 @@ void GetfromMometer(){
   Serial.print("Humidity: ");
   Serial.print(Sensor.GetRelHumidity());
   Serial.println("%");
+}
+
+//File transfer
+#include <WebServer.h>
+#include <WiFiMulti.h>
+
+WebServer server(80);
+WiFiMulti wifiMulti;
+
+File fsUploadFile;
+
+String IPAD = "192.168.0.254";  //后两位与 IPAD1 IPAD2保持一致
+uint8_t IPAD1 = 0;        //TP-LINK：0 ，水星：1 ，华为：3 ，小米：31
+uint8_t IPAD2 = 254;      //自行设置 2~254
+
+void handleFileUpload() {
+
+  HTTPUpload& upload = server.upload();
+
+  if (upload.status == UPLOAD_FILE_START) {                   // 如果上传状态为UPLOAD_FILE_START
+
+    String filename = upload.filename;                        // 建立字符串变量用于存放上传文件名
+    if (!filename.startsWith("/")) filename = "/User/" + User + "/Data/upload/" + filename; // 为上传文件名前加上"/"
+    Serial.println("File Name: " + filename);                 // 通过串口监视器输出上传文件的名称
+
+    fsUploadFile = SD_MMC.open(filename, FILE_WRITE);            // 在SD卡中建立文件用于写入用户上传的文件数据
+
+  }
+  else if (upload.status == UPLOAD_FILE_WRITE) {        // 如果上传状态为UPLOAD_FILE_WRITE
+
+    if (fsUploadFile)
+      fsUploadFile.write(upload.buf, upload.currentSize); // 向SD卡文件写入浏览器发来的文件数据
+
+  }
+  else if (upload.status == UPLOAD_FILE_END) {          // 如果上传状态为UPLOAD_FILE_END
+    if (fsUploadFile) {                                   // 如果文件成功建立
+      fsUploadFile.close();                               // 将文件关闭
+      //      Serial.println(" Size: "+ upload.totalSize);        // 通过串口监视器输出文件大小
+      server.sendHeader("Location", "/System/Server/success.html"); // 将浏览器跳转到/success.html（成功上传页面）
+      server.send(303);                               // 发送相应代码303（重定向到新页面）
+    }
+    else {                                              // 如果文件未能成功建立
+      Serial.println("File upload failed");               // 通过串口监视器输出报错信息
+      server.send(500, "text/plain", "500: couldn't create file"); // 向浏览器发送相应代码500（服务器错误）
+    }
+  }
+}
+//回复状态码 200 给客户端
+void respondOK() {
+  server.send(200);
+}
+//从文件路径中获取文件名
+String indexOfFilename(String filename)  {
+  char filename2[200];
+  uint8_t len = 0;
+  uint8_t cout = 0;
+  uint8_t i, j = 0;
+  len = filename.length();
+  for (i = 0; i <= len; i++) {
+    if (filename[i] == '/') {
+      cout = i;
+    }
+  }
+  for (i = cout + 1; i <= len; i++) {
+    if (j < 195) {
+      filename2[j] = filename[i];
+      j++;
+    }
+  }
+  j = 0;
+  filename = filename2;
+  return filename;
+}
+//计算文件大小
+String formatBytes(size_t bytes) {
+  if (bytes < 1024) {
+    return String(bytes) + "B";
+  } else if (bytes < (1024 * 1024)) {
+    return String(bytes / 1024.0) + "KB";
+  } else if (bytes < (1024 * 1024 * 1024)) {
+    return String(bytes / 1024.0 / 1024.0) + "MB";
+  } else {
+    return String(bytes / 1024.0 / 1024.0 / 1024.0) + "GB";
+  }
+}
+void File_transfer_listDir(fs::FS &fs, const char * dirname, uint8_t levels) {
+  Serial.printf("Listing directory: %s\n", dirname);
+  File root = fs.open(dirname);
+  if (!root) {
+    Serial.println("Failed to open directory");
+    return;
+  }
+  if (!root.isDirectory()) {
+    Serial.println("Not a directory");
+    return;
+  }
+  File file = root.openNextFile();
+  while (file) {
+    if (file.isDirectory()) {
+      Serial.print("  DIR : ");
+      Serial.println(file.name());
+      if (levels) {
+        File_transfer_listDir(fs, file.name(), levels - 1);
+      }
+    } else {
+      Serial.print("  FILE: ");
+      Serial.print(file.name());
+      Serial.print("  SIZE: ");
+      Serial.println(file.size());
+    }
+    file = root.openNextFile();
+  }
+}
+//列出上传的文件
+String listUploadDir(fs::FS &fs, const char * dirname, uint8_t levels) {
+  String filename = "";
+  String filename2 = "";
+  String message = "";
+  File root = fs.open(dirname);
+  if (!root) {
+    message += "Failed to open directory <br />";
+    return message;
+  }
+  if (!root.isDirectory()) {
+    message += "Not a directory <br />";
+    return message;
+  }
+  File file = root.openNextFile();
+  while (file) {
+    if (file.isDirectory()) {
+      message += "  DIR : ";
+      message += String(file.name()) + String("<br />");
+      if (levels) {
+        message += listUploadDir(fs, file.name(), levels - 1);
+      }
+    } else {
+      filename = String(file.name());
+      filename2 = indexOfFilename(filename);
+      message += "  FILE: " + filename2 + "  <a href=\"" + filename + "\" download=\"" + filename2 + "\">download</a><br />";
+      message += String("  SIZE: ");
+      message += formatBytes(file.size()) + String("<br /><br />");
+    }
+    file = root.openNextFile();
+  }
+  return message;
+}
+void listUploadFile() {
+  String UPFDir = "/User/" + User + "/Data/upload";
+  if (!server.authenticate("list", "file")) //校验用户是否登录
+  {
+    return server.requestAuthentication(); //请求进行用户登录认证
+  }
+  String header = "<html><body>";
+  String message = header + "<h2>upload:</h2>";
+  message += listUploadDir(SD_MMC, UPFDir.c_str(), 1);
+  server.send(200, "text/html", message);
+}
+// 获取文件类型
+String getContentType(String filename) {
+  if (filename.endsWith(".htm")) return "text/html";
+  else if (filename.endsWith(".html")) return "text/html";
+  else if (filename.endsWith(".css")) return "text/css";
+  else if (filename.endsWith(".js")) return "application/javascript";
+  else if (filename.endsWith(".png")) return "image/png";
+  else if (filename.endsWith(".gif")) return "image/gif";
+  else if (filename.endsWith(".jpg")) return "image/jpeg";
+  else if (filename.endsWith(".ico")) return "image/x-icon";
+  else if (filename.endsWith(".xml")) return "text/xml";
+  else if (filename.endsWith(".swf")) return "application/x-shockwave-flash";
+  else if (filename.endsWith(".SWF")) return "application/x-shockwave-flash";
+  else if (filename.endsWith(".acc")) return "audio/aac";
+  else if (filename.endsWith(".mp3")) return "audio/mpeg";
+  else if (filename.endsWith(".avi")) return "video/x-msvideo";
+  else if (filename.endsWith(".mp4")) return "video/mp4";
+  else if (filename.endsWith(".mpeg")) return "video/mpeg";
+  else if (filename.endsWith(".m3u8")) return "application/x-mpegURL";
+  else if (filename.endsWith(".m3u8")) return "video/MP2T";
+  else if (filename.endsWith(".pdf")) return "application/x-pdf";
+  else if (filename.endsWith(".zip")) return "application/x-zip";
+  else if (filename.endsWith(".gz")) return "application/x-gzip";
+  return "text/plain";
+}
+bool handleFileRead(String path) {            //处理浏览器HTTP访问
+  if (path.endsWith("/")) {                   // 如果访问地址以"/"为结尾
+    path = "/index.html";                     // 则将访问地址修改为/index.html便于SPIFFS访问
+  }
+  String contentType = getContentType(path);  // 获取文件类型
+  if (SD_MMC.exists(path)) {                     // 如果访问的文件可以在SPIFFS中找到
+    File file = SD_MMC.open(path, FILE_READ);          // 则尝试打开该文件
+    server.streamFile(file, contentType);// 并且将该文件返回给浏览器
+    file.close();                                // 并且关闭文件
+    return true;                                 // 返回true
+  }
+  return false;                                  // 如果文件未找到，则返回false
+}
+void handleNotFound() //未注册链接回调函数
+{
+  bool fileReadOK = handleFileRead(server.uri()); // 通过handleFileRead函数处处理用户访问
+  if (!fileReadOK) {
+    File PNFFile = SD_MMC.open("/System/Server/404.html");
+    server.streamFile(PNFFile, "text/html");
+    PNFFile.close();
+  }
+}
+void File_transfer_init(){
+  tft.setCursor(0,0);
+
+  IPAddress staticIP(192, 168, IPAD1, IPAD2);
+  IPAddress gateway(192, 168, 1, 1);
+  IPAddress subnet(255, 255, 255, 0);
+  IPAddress dns(8, 8, 8, 8);
+  WiFi.disconnect();
+  WiFi.config(staticIP, gateway, subnet, dns);
+  WiFi.mode(WIFI_STA);
+  wifiMulti.addAP("TP-LINK_6A56", "bobo512w999580");
+  wifiMulti.addAP("TP-LINK_6A56", "bobo512w999580");
+  Serial.println("Connecting ...");
+  tft.println("Connecting ...");
+  while (wifiMulti.run() != WL_CONNECTED) {
+    delay(1000);
+    Serial.print(".");
+    tft.print(".");
+  }
+  Serial.print("Connected to ");
+  Serial.println(WiFi.SSID());
+  Serial.print("IP address:\t");
+  Serial.println(WiFi.localIP());
+
+  tft.print("Connected to ");
+  tft.setTextColor(TFT_BLUE);
+  tft.println(WiFi.SSID());
+  tft.setTextColor(TFT_WHITE);
+  tft.print("IP address:\t");
+  tft.setTextColor(TFT_BLUE);
+  tft.println(WiFi.localIP());
+  tft.setTextColor(TFT_WHITE);
+
+  server.on("/System/Server/upload.html",   // 如果客户端通过upload页面
+            HTTP_POST,
+            respondOK,        // 则回复状态码 200 给客户端
+            handleFileUpload);// 并且运行处理文件上传函数
+  server.on("/filelist", HTTP_GET, listUploadFile);
+  server.onNotFound(handleNotFound);
+  server.begin();
+  Serial.println("Web服务器启动");
+  Serial.print("Got IP: ");
+  Serial.println(WiFi.localIP());
+}
+
+//Network
+#include <NTPClient.h>
+#include <WiFiUdp.h>
+
+#define NTP_OFFSET  28800
+#define NTP_INTERVAL 1 * 1000
+#define NTP_ADDRESS  "ntp.ntsc.ac.cn"
+
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP, NTP_ADDRESS, NTP_OFFSET, NTP_INTERVAL);
+
+void getNetTime(){
+  timeClient.begin();
+  timeClient.update();
+  unsigned long epochTime = timeClient.getEpochTime();
+  struct tm *ptm = gmtime ((time_t *)&epochTime);
+  int monthDay = ptm->tm_mday;
+  int tm_Month = ptm->tm_mon + 1;
+  int tm_Year = ptm->tm_year + 1900;
+  timeClient.getFormattedTime();
 }
