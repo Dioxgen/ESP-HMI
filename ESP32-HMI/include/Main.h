@@ -1526,7 +1526,7 @@ void File_transfer(){
 
 //Network
 void Network(){
-  ConnectToWiFi();
+  WiFiInit("AP");
 }
 
 void DrawAPP() {

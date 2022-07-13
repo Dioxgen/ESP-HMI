@@ -792,19 +792,100 @@ void GetfromMometer(){
   Serial.println("%");
 }
 
-//File transfer
-#include <WebServer.h>
+//Network
+#include <NTPClient.h>
+#include <WiFiUdp.h>
+#include <WiFiClient.h>
+#include <WiFiAP.h>
 #include <WiFiMulti.h>
 
-WebServer server(80);
-WiFiMulti wifiMulti;
+#define NTP_OFFSET  28800
+#define NTP_INTERVAL 1 * 1000
+#define NTP_ADDRESS  "ntp.ntsc.ac.cn"
 
-File fsUploadFile;
-File contentFile;
+const char *ssid = "ESP-HMI";
+const char *psword = "123456789";
 
+String WiFiMode;
 String IPAD = "192.168.0.254";  //后两位与 IPAD1 IPAD2保持一致
 uint8_t IPAD1 = 0;        //TP-LINK：0 ，水星：1 ，华为：3 ，小米：31
 uint8_t IPAD2 = 254;      //自行设置 2~254
+
+WiFiUDP ntpUDP;
+NTPClient timeClient(ntpUDP, NTP_ADDRESS, NTP_OFFSET, NTP_INTERVAL);
+WiFiMulti wifiMulti;
+
+void getNetTime(){
+  timeClient.begin();
+  timeClient.update();
+  unsigned long epochTime = timeClient.getEpochTime();
+  struct tm *ptm = gmtime ((time_t *)&epochTime);
+  int monthDay = ptm->tm_mday;
+  int tm_Month = ptm->tm_mon + 1;
+  int tm_Year = ptm->tm_year + 1900;
+  timeClient.getFormattedTime();
+}
+void WiFiInit(String Mode){
+  tft.setCursor(0,0);
+  tft.setTextColor(TFT_WHITE);
+  if (Mode == "AP") {
+    WiFi.softAP(ssid, psword);
+    IPAddress myIP = WiFi.softAPIP();
+    Serial.print("SSID: ");
+    Serial.println(ssid);
+    Serial.print("AP IP address: ");
+    Serial.println(myIP);
+    tft.print("SSID: ");
+    tft.setTextColor(TFT_GREEN);
+    tft.println(ssid);
+    tft.setTextColor(TFT_WHITE);
+    tft.print("AP IP address: ");
+    tft.setTextColor(TFT_GREEN);
+    tft.println(myIP);
+    tft.setTextColor(TFT_WHITE);
+    WiFiMode = "AP";
+  }
+  else if (Mode == "STA") {
+    IPAddress staticIP(192, 168, IPAD1, IPAD2);
+    IPAddress gateway(192, 168, 1, 1);
+    IPAddress subnet(255, 255, 255, 0);
+    IPAddress dns(8, 8, 8, 8);
+    //WiFi.disconnect();
+    WiFi.config(staticIP, gateway, subnet, dns);
+    WiFi.mode(WIFI_STA);
+    wifiMulti.addAP("TP-LINK_6A56", "bobo512w999580");
+    wifiMulti.addAP("TP-LINK_6A56", "bobo512w999580");
+    Serial.println("Connecting ...");
+    tft.println("Connecting ...");
+    while (wifiMulti.run() != WL_CONNECTED) {
+      delay(1000);
+      Serial.print(".");
+      tft.print(".");
+    }
+    Serial.print("Connected to ");
+    Serial.println(WiFi.SSID());
+    Serial.print("IP address:\t");
+    Serial.println(WiFi.localIP());
+
+    tft.print("Connected to ");
+    tft.setTextColor(TFT_GREEN);
+    tft.println(WiFi.SSID());
+    tft.setTextColor(TFT_WHITE);
+    tft.print("IP address:\t");
+    tft.setTextColor(TFT_GREEN);
+    tft.println(WiFi.localIP());
+    tft.setTextColor(TFT_WHITE);
+    WiFiMode = "STA";
+  }
+}
+
+//File transfer
+#include <WebServer.h>
+
+WebServer server(80);
+
+File fsUploadFile;
+File contentFile;
 
 void handleFileUpload() {
 
@@ -815,9 +896,19 @@ void handleFileUpload() {
     String filename = upload.filename;                        // 建立字符串变量用于存放上传文件名
     if (!filename.startsWith("/")) filename = "/User/" + User + "/Data/upload/" + filename; // 为上传文件名前加上"/"
     Serial.println("File Name: " + filename);                 // 通过串口监视器输出上传文件的名称
-
-    fsUploadFile = SD_MMC.open(filename, FILE_WRITE);            // 在SD卡中建立文件用于写入用户上传的文件数据
-
+    if (SD_MMC.exists(filename)) {
+      contentFile = SD_MMC.open("/System/Server/DuplicateFileName.html");
+      if (!contentFile) {
+        Serial.println("读取文件失败");
+        return;
+      }
+      server.streamFile(contentFile, "text/html");
+      contentFile.close();
+      server.send(500, "text/plain", "500: couldn't create file");
+    }
+    else {
+      fsUploadFile = SD_MMC.open(filename, FILE_WRITE);            // 在SD卡中建立文件用于写入用户上传的文件数据
+    }
   }
   else if (upload.status == UPLOAD_FILE_WRITE) {        // 如果上传状态为UPLOAD_FILE_WRITE
 
@@ -1017,7 +1108,7 @@ void favicon(){
 }
 void File_transfer_init(){
   tft.setCursor(0,0);
-  if (WiFi.isConnected()) {
+  if (WiFiMode == "STA") {
     server.on("/",ServerMainPage);
     server.on("/favicon.ico", favicon);
     server.on("/System/Server/upload.html",   // 如果客户端通过upload页面
@@ -1035,65 +1126,35 @@ void File_transfer_init(){
     tft.setTextColor(TFT_GREEN);
     tft.println(WiFi.localIP());
     tft.setTextColor(TFT_WHITE);
+    tft.print("Mode: ");
+    tft.setTextColor(TFT_BLUE);
+    tft.println(WiFiMode);
+    tft.setTextColor(TFT_WHITE);
+  }
+  else if (WiFiMode == "AP") {
+    server.on("/",ServerMainPage);
+    server.on("/favicon.ico", favicon);
+    server.on("/System/Server/upload.html",   // 如果客户端通过upload页面
+              HTTP_POST,
+              respondOK,        // 则回复状态码 200 给客户端
+              handleFileUpload);// 并且运行处理文件上传函数
+    server.on("/filelist", HTTP_GET, listUploadFile);
+    server.onNotFound(handleNotFound);
+    server.begin();
+    Serial.println("Web服务器启动");
+    Serial.print("Got IP: ");
+    Serial.println(WiFi.softAPIP());
+    tft.println("WebServer Started");
+    tft.print("Got IP: ");
+    tft.setTextColor(TFT_GREEN);
+    tft.println(WiFi.softAPIP());
+    tft.setTextColor(TFT_WHITE);
+    tft.print("Mode: ");
+    tft.setTextColor(TFT_BLUE);
+    tft.println(WiFiMode);
+    tft.setTextColor(TFT_WHITE);
   }
   else {
     tft.print("Please connect to WiFi first.");
   }
-}
-
-//Network
-#include <NTPClient.h>
-#include <WiFiUdp.h>
-
-#define NTP_OFFSET  28800
-#define NTP_INTERVAL 1 * 1000
-#define NTP_ADDRESS  "ntp.ntsc.ac.cn"
-
-WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP, NTP_ADDRESS, NTP_OFFSET, NTP_INTERVAL);
-
-void getNetTime(){
-  timeClient.begin();
-  timeClient.update();
-  unsigned long epochTime = timeClient.getEpochTime();
-  struct tm *ptm = gmtime ((time_t *)&epochTime);
-  int monthDay = ptm->tm_mday;
-  int tm_Month = ptm->tm_mon + 1;
-  int tm_Year = ptm->tm_year + 1900;
-  timeClient.getFormattedTime();
-}
-void ConnectToWiFi(){
-  tft.setCursor(0,0);
-
-  IPAddress staticIP(192, 168, IPAD1, IPAD2);
-  IPAddress gateway(192, 168, 1, 1);
-  IPAddress subnet(255, 255, 255, 0);
-  IPAddress dns(8, 8, 8, 8);
-  //WiFi.disconnect();
-  WiFi.config(staticIP, gateway, subnet, dns);
-  WiFi.mode(WIFI_STA);
-  wifiMulti.addAP("TP-LINK_6A56", "bobo512w999580");
-  wifiMulti.addAP("TP-LINK_6A56", "bobo512w999580");
-  Serial.println("Connecting ...");
-  tft.println("Connecting ...");
-  while (wifiMulti.run() != WL_CONNECTED) {
-    delay(1000);
-    Serial.print(".");
-    tft.print(".");
-  }
-  Serial.print("Connected to ");
-  Serial.println(WiFi.SSID());
-  Serial.print("IP address:\t");
-  Serial.println(WiFi.localIP());
-
-  tft.print("Connected to ");
-  tft.setTextColor(TFT_GREEN);
-  tft.println(WiFi.SSID());
-  tft.setTextColor(TFT_WHITE);
-  tft.print("IP address:\t");
-  tft.setTextColor(TFT_GREEN);
-  tft.println(WiFi.localIP());
-  tft.setTextColor(TFT_WHITE);
-
-  delay(2000);
 }
