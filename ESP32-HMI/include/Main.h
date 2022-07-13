@@ -1518,7 +1518,6 @@ void File_transfer(){
       X_Coord = touch.X();
       Y_Coord = touch.Y();
       if (450 < X_Coord && X_Coord < 480 && 0 < Y_Coord && Y_Coord < 30) {
-        WiFi.mode(WIFI_OFF);
         break;
       }
     }
@@ -1527,7 +1526,7 @@ void File_transfer(){
 
 //Network
 void Network(){
-
+  ConnectToWiFi();
 }
 
 void DrawAPP() {

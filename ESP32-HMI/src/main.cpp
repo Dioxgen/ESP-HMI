@@ -38,7 +38,7 @@
 void setup() {
 
   Serial.begin(115200);
-  WiFi.mode(WIFI_OFF);
+  //WiFi.mode(WIFI_OFF);
 
   gfx->begin(60000000);
 
