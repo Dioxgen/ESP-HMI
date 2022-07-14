@@ -1020,8 +1020,10 @@ String listUploadDir(fs::FS &fs, const char * dirname, uint8_t levels) {
     } else {
       filename = String(file.name());
       filename2 = indexOfFilename(filename);
-      message += "  FILE: " + filename2 + "  <a href=\"" + filename + "\" download=\"" + filename2 + "\">download</a><br />";
-      message += String("  SIZE: ");
+      message += "  File: " + filename2 + "    <a href=\"" + filename + "\" download=\"" + filename2 + "\">[Download]</a>";
+      message += "    <a href=\"" + filename + "\" target=\"_self\">" + "[View]" + "</a>";//直接查看功能
+      message += String("<br />");
+      message += String("  Size: ");
       message += formatBytes(file.size()) + String("<br /><br />");
     }
     file = root.openNextFile();
