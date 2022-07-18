@@ -806,7 +806,7 @@ void GetfromMometer(){
 const char *ssid = "ESP-HMI";
 const char *psword = "123456789";
 
-String WiFiMode;
+String WiFiMode = "NULL";
 String IPAD = "192.168.0.254";  //后两位与 IPAD1 IPAD2保持一致
 uint8_t IPAD1 = 0;        //TP-LINK：0 ，水星：1 ，华为：3 ，小米：31
 uint8_t IPAD2 = 254;      //自行设置 2~254
@@ -1051,6 +1051,7 @@ String getContentType(String filename) {
   else if (filename.endsWith(".gif")) return "image/gif";
   else if (filename.endsWith(".jpg")) return "image/jpeg";
   else if (filename.endsWith(".ico")) return "image/x-icon";
+  else if (filename.endsWith(".tiff")) return "image/tiff";
   else if (filename.endsWith(".xml")) return "text/xml";
   else if (filename.endsWith(".swf")) return "application/x-shockwave-flash";
   else if (filename.endsWith(".SWF")) return "application/x-shockwave-flash";

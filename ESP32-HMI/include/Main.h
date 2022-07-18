@@ -1526,7 +1526,87 @@ void File_transfer(){
 
 //Network
 void Network(){
-  WiFiInit("AP");
+  tft.fillScreen(TFT_BLACK);
+  tft.setCursor(0,0);
+  if (WiFiMode == "AP") {
+    tft.print("SSID: ");
+    tft.setTextColor(TFT_GREEN);
+    tft.println(ssid);
+    tft.setTextColor(TFT_WHITE);
+    tft.print("AP IP address: ");
+    tft.setTextColor(TFT_GREEN);
+    tft.println(WiFi.softAPIP());
+    tft.setTextColor(TFT_WHITE);
+
+    tft.println("");
+    tft.print("Change Mode");
+
+    while (1){
+      if (touch.Pressed()) {
+        X_Coord = touch.X();
+        Y_Coord = touch.Y();
+        if (0 < X_Coord && X_Coord < 130 && 80 < Y_Coord && Y_Coord < 110) {
+          WiFiMode = "NULL";
+          Network();
+        }
+        else if (450 < X_Coord && X_Coord < 480 && 0 < Y_Coord && Y_Coord < 30) {
+          break;
+        }
+      }
+    }
+  }
+  else if (WiFiMode == "STA") {
+    tft.print("Connected to ");
+    tft.setTextColor(TFT_GREEN);
+    tft.println(WiFi.SSID());
+    tft.setTextColor(TFT_WHITE);
+    tft.print("IP address:\t");
+    tft.setTextColor(TFT_GREEN);
+    tft.println(WiFi.localIP());
+    tft.setTextColor(TFT_WHITE);
+
+    tft.println("");
+    tft.print("Change Mode");
+
+    while (1){
+      if (touch.Pressed()) {
+        X_Coord = touch.X();
+        Y_Coord = touch.Y();
+        if (0 < X_Coord && X_Coord < 130 && 80 < Y_Coord && Y_Coord < 110) {
+          WiFiMode = "NULL";
+          Network();
+        }
+        else if (450 < X_Coord && X_Coord < 480 && 0 < Y_Coord && Y_Coord < 30) {
+          break;
+        }
+      }
+    }
+  }
+  else if (WiFiMode == "NULL") {
+    tft.print("Please select a mode:");
+    tft.setCursor(60,130);
+    tft.setTextSize(3);
+    tft.setTextColor(TFT_ORANGE);
+    tft.print("AP       STA");
+    tft.setTextSize(1);
+    while (1){
+      if (touch.Pressed()) {
+        X_Coord = touch.X();
+        Y_Coord = touch.Y();
+        if (60 < X_Coord && X_Coord < 200 && 130 < Y_Coord && Y_Coord < 190) {
+          tft.fillScreen(TFT_BLACK);
+          WiFiInit("AP");
+        }
+        else if (240 < X_Coord && X_Coord < 420 && 130 < Y_Coord && Y_Coord < 190) {
+          tft.fillScreen(TFT_BLACK);
+          WiFiInit("STA");
+        }
+        else if (450 < X_Coord && X_Coord < 480 && 0 < Y_Coord && Y_Coord < 30) {
+          break;
+        }
+      }
+    }
+  }
 }
 
 void DrawAPP() {
