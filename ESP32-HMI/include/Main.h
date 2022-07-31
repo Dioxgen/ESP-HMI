@@ -1609,6 +1609,7 @@ void Network(){
   }
 }
 
+//Desktop
 void DrawAPP() {
   tft.fillRect(0, 30, 400, 270, tft.color565(0, 0, 30));
   if (Mainpage == 1) {

@@ -1161,3 +1161,57 @@ void File_transfer_init(){
     tft.print("Please connect to WiFi first.");
   }
 }
+
+//DS1307
+#include <DS1307ESP.h>
+
+DS1307ESP rtc;
+
+uint32_t lastTime;
+
+void DS1307(){
+  rtc.begin(); 
+// rtc.begin(sdapin, sclpin);                     
+  rtc.DSadjust(0, 19, 21, 2022, 3, 16); // 00:19:21 16 Mar 2022
+// rtc.DSadjust(1647216003); // 00:00:03 14 Mar 2022
+// rtc.SetFont(0);                         //  language 0 = EN  |  1 = FR  |  2 = GR 
+  while(1){
+    rtc.DSread(); 
+      Serial.println(rtc.getMahmin(true));      //  (String) true = 00:00  false = 00 00  (24h)
+      Serial.println(rtc.getMihmin(true));      //  (String) true = 12:00  false = 12 00  (12h)
+      Serial.println(rtc.getTime());          //  (String) 00:00:03  (24h)
+      Serial.println(rtc.getTime(true));      //  (String) 12:00:03  (12h)
+      Serial.println(rtc.getDate());          //  (String) Mon, 14 Mar 2022
+      Serial.println(rtc.getDate(true));      //  (String) Monday, 14-March-2022
+      Serial.println(rtc.getDateTime());      //  (String) Mon, 14 Mar 2022 00:09:21
+      Serial.println(rtc.getDateTime(true));  //  (String) Monday, 14-March-2022 00:09:21
+      Serial.println(rtc.getTimeDate());      //  (String) 12:07:18 Mon, 14 Mar 2022
+      Serial.println(rtc.getTimeDate(true));  //  (String) 00:00:03 Monday, 14-March-2022
+      Serial.println(rtc.getDayDate());       //  (String) 2022-03-14
+      Serial.println(""); 
+      Serial.println(rtc.getSecond());        //  (String)     30    (00-59)
+      Serial.println(rtc.getMinute());        //  (String)     58    (00-59)
+      Serial.println(rtc.getHour());          //  (String)     12    (01-12)
+      Serial.println(rtc.getHour(true));      //  (String)     00    (00-23)
+      Serial.println(rtc.getDay());           //  (String)     14    (1-31)
+      Serial.println(rtc.getMonth());         //  (String)     Mar
+      Serial.println(rtc.getMonth(true));     //  (String)     March
+      Serial.println(rtc.getYear());          //  (String)     2022
+      Serial.println(rtc.getDayofWeek());     //  (String)     Mon
+      Serial.println(rtc.getDayofWeek(true)); //  (String)     Monday
+      Serial.println(rtc.getAmPm());          //  (String)  pm
+      Serial.println(rtc.getAmPm(true));      //  (String)  PM
+      Serial.println(""); 
+      Serial.println(rtc.getEpoch());         //  (long)    1647216003
+      Serial.println(rtc.second);             //  (int)     30    (0-59)
+      Serial.println(rtc.minute);             //  (int)     58    (0-59)
+      Serial.println(rtc.hour);               //  (int)     0     (0-23)
+      Serial.println(rtc.dayOfMonth);         //  (int)     14    (1-31)
+      Serial.println(rtc.month);              //  (int)     3     (1-12)
+      Serial.println(rtc.year + 2000);        //  (int)     2022
+      Serial.println(rtc.dayOfWeek);          //  (int)     1     (0-6)
+      Serial.println(rtc.DayofYear);          //  (int)     73    (0-365)
+      Serial.println(""); 
+      delay(1000);
+  }
+}
