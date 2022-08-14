@@ -92,37 +92,11 @@ void setup() {
   }
   tft.fillScreen(TFT_BLACK);
   tft.setCursor(0, 0, 4);
-  /*
-  IPAddress staticIP(192, 168, IPAD1, IPAD2);
-  IPAddress gateway(192, 168, 1, 1);
-  IPAddress subnet(255, 255, 255, 0);
-  IPAddress dns(8, 8, 8, 8);
-  WiFi.disconnect();
-  WiFi.config(staticIP, gateway, subnet, dns);
-  WiFi.mode(WIFI_STA);
-  wifiMulti.addAP("TP-LINK_6A56", "bobo512w999580");
-  wifiMulti.addAP("TP-LINK_6A56", "bobo512w999580");
-  Serial.println("Connecting ...");
-  while (wifiMulti.run() != WL_CONNECTED) {
-    delay(1000);
-    Serial.print(".");
-  }
-  Serial.print("Connected to ");
-  Serial.println(WiFi.SSID());
-  Serial.print("IP address:\t");
-  Serial.println(WiFi.localIP());
-  tft.print("Connected to ");
-  tft.println(WiFi.SSID());
-  tft.print("IP address:\t");
-  tft.println(WiFi.localIP());
-  */
   if (StartPrint){
     tft.println(readFileLine("/System/Users/Users.txt", 1));
     tft.println(readFileLine("/System/Users/Users.txt", 2));
     tft.println(readFileLine("/System/Users/Users.txt", 3));
     tft.println(readFileLine("/System/Settings/Initial interface.txt", 1));
-//  tft.println(readFileLine("/System/Settings/LastUser.txt", 1));
-//  tft.println(readFileLine("/User/SoTWild/Data/Others/password.txt", 1));
   }
 
   //Demos:

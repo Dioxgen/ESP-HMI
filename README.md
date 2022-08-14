@@ -2,15 +2,19 @@
 
 ###### 【Designed by SoTWild】
 
-[TOC]
+<img src="https://i2.imgu.cc/images/2022/08/12/CMhEY.jpg" style="zoom:8%;" />
 
-ESP-HMI 是 [Link 设备链](/blog/sotwild/20211025.html)中的一个，是整个项目最**难**开发的部分，主要提供**远程直接开关设备、数据汇总（设备监控）**的功能。
+## 概述：
+
+ESP-HMI 是 Link 设备链中的一个，是整个项目最**难**开发的部分，主要提供**远程直接开关设备、数据汇总（设备监控）**。
 
 我还开发了一些针对**不同人群**的功能：**文本阅读、编辑、图片查看、播放MJPEG视频、运行小程序**等。如果你是**开发者**，你也可以使用引出的I/O对它进行**二次开发**。（普通人可以把它看做一个功能**极其简单**的小电脑）
 
 为了高效率运行程序，我移植了 **FreeRTOS** 操作系统，使得主控芯片可以 “同时” 运行多个程序。
 
 ------
+
+## ESP-HMI 硬件
 
 ### 主要硬件组成：
 
@@ -22,7 +26,7 @@ ESP-HMI 是 [Link 设备链](/blog/sotwild/20211025.html)中的一个，是整�
 
 <center>ESP32-WROVER 模组</center>
 
-#### · 3.5 寸 TFT
+#### · 3.5 寸 TFT_LCD
 
 > 驱动芯片：ILI9488
 >
@@ -42,11 +46,9 @@ ESP-HMI 是 [Link 设备链](/blog/sotwild/20211025.html)中的一个，是整�
 
 <center>32G TF卡</center>
 
-#### · 传感器
+#### · SHT30：
 
-**SHT30 模拟温湿度传感器**（I2C接口）
-
-SHT30能够提供极高的可靠性和出色的长期稳定性，具有功耗低、反应快、抗干扰能力强等优点。
+SHT30能够提供极高的**可靠性**和出色的长期**稳定性**，具有**功耗低、反应快、抗干扰能力强**等优点。
 
 轻松实现城市环境监控、智能楼宇、工业自动化、智能家居等物联网应用场景的温湿度传感。
 
@@ -57,14 +59,14 @@ SHT30能够提供极高的可靠性和出色的长期稳定性，具有功耗低
 > - 产品尺寸：30×22 mm
 > - 重量：3 g
 
-**温度测量性能**
+**温度测量性能：**
 
 > - 量程：-40 ~ 125 ℃
 > - 分辨率：0.01 ℃，14bit
 > - 精度：±0.2℃@10~55℃（典型值），±1.5℃@-40 ~ 125 ℃（典型值）
 > - 响应速度：> 2s
 
-**湿度测量性能**
+**湿度测量性能：**
 
 > - 量程：0~100 %RH
 > - 分辨率：0.006 %，14bit
@@ -83,31 +85,207 @@ PCF8563 是 PHILIPS 公司推出的一款**工业级内含I2C 总线接口功能
 
 <center>PCF8563 模块</center>
 
-#### PCB:
+#### · MPU6050：
 
-验证板：只有最基础硬件（包括SHT30），注意 GPIO2 在烧录程序时需断开，如果你要频繁烧录程序，最好 PCB上飞线一个开关，或者拔下开发板（如果你愿意的话）。
+MPU-60X0 是全球首例 **⑨ 轴运动处理传感器**。它集成了3 轴MEMS**陀螺仪**，3 轴MEMS**加速度计**，以及一个可扩展的数字运动处理器**DMP**，可用**I2C**接口连接一个**第三方**的数字传感器，比如磁力计。扩展之后就可以通过其**I2C 或 SPI** 接口输出一个⑨轴的信号（SPI 接口仅在MPU-6000 可用）。
 
-[Gerber_PCB_ESP32开发直插板.zip](https://github.com/SoTWild/ESP-HMI/blob/main/PCB/验证板/Gerber_PCB_ESP32开发直插板.zip)
+MPU-60X0 对陀螺仪和加速度计分别用了三个**16位的ADC**（0~65535），将其测量的模拟量转化为可输出的数字量。传感器的测量范围都是用户可控的，陀螺仪可测范围为**±250，±500，±1000，±2000°/秒（dps）**，加速度计可测范围为**±2，±4，±8，±16g**。
+
+芯片尺寸**4×4×0.9mm**，采用**QFN**封装，可承受最大**10000g**的冲击，并有可编程的**低通滤波器**。
+
+<img src="https://rukminim1.flixcart.com/image/1408/1408/learning-toy/g/h/v/robokits-triple-axis-accelerometer-gyro-mpu-6050-breakout-original-imae3ux6t2hrcz65.jpeg?q=90" style="zoom:10%;" />
+
+<center>MPU6050模块</center>
+
+#### · CH340C：
+
+USB转串口芯片，支持通讯波特率50bps～2Mbps。
+
+此型号内置时钟，无需外部晶振。
+
+<img src="https://dsindustrie.com/wp-content/uploads/2018/07/Convertisseur-CH340C-Micro-USB-vers-TTL-Maroc.jpg" style="zoom:20%;" />
+
+<center>搭载了CH340C的串口下载模块</center>
+
+#### · PW2053：
+
+PW2053是一款高效单片同步降压调节器。
+
+[点我下载DataSheet](https://www.pwchip.com/file-download-967-left.html)
+
+![](https://www.pwchip.com/file.php?f=202012/f_e6e9ab266c9b037b25d5c88e1e2a627c.png&t=png&o=product&s=smallURL&v=1627957605)
+
+<center>没找到实物图……</center>
+
+#### · TP4056:
+
+TP4056 是一款完整的**单节锂离子电池**采用恒定电流/恒定电压**线性充电器**。
+
+<img src="https://img.alicdn.com/imgextra/i1/2920967664/TB2ULTimC0jpuFjy0FlXXc0bpXa_!!2920967664.png" style="zoom:25%;" />
+
+<center>著名的充电模块</center>
+
+#### · WT8302：
+
+WT8302系列是一款**超低EM.3.0W,单声道,D类音频功率放大器**。在5V电源下,能够向**4Ω负载提供3.0W**的输出功率,并具有高达**90%**的效率。
+
+<img src="https://www.wtchip.com/uploads/allimg/2102/1-2102230TZ0.jpg" style="zoom:30%;" />
+
+<center>没找到实物图……</center>
+
+------
+
+### PCB:
+
+##### 验证板：
+
+只有最**基础硬件**（包括SHT30），注意 **GPIO2** 在烧录程序时需断开，如果你要频繁烧录程序，最好 PCB上飞线一个开关，或者拔下开发板（如果你愿意的话）。
+
+##### Bug：
+
+> （1）**T_CLK**应连接**IO0**而不是IO25，**已**经在最新的PCB中**改正**。
+>
+> （2）不要在意有两个ESP32开发板的插槽
+
+[Gerber_PCB_ESP32开发直插板.zip]()
 
 <img src="https://i2.imgu.cc/images/2022/04/27/CK8ux.jpg" style="zoom:10%;" />
 
 <center>验证板</center>
 
-最终板：硬件齐全，自动烧录，配备电池。
+##### 最终板：
 
-[还没设计完……](https://github.com/SoTWild/ESP-HMI)
+硬件齐全，自动烧录，配备电池。
 
-##### 元件解读：
+##### Bug：
 
-[还没设计完……](https://github.com/SoTWild/ESP-HMI)
+（1）DC-DC电源部分电感封装大小错误。**解决办法：可以勉强焊接**
+
+（2）R15连接Strapping引脚导致无法启动。**解决方法：不焊接R15**
+
+（3）PCF8563设计缺陷，晶振波形错误。**解决方法：重新设计**
+
+（4）**T_CLK**应连接**IO0**而不是IO25，**原理图已改正，PCB未改正**。**解决办法：飞线**
+
+（5）WT8302设计缺陷，杂音。**解决方法：重新设计**
+
+[Gerber]()
+
+##### 原理图：
+
+![](https://i2.imgu.cc/images/2022/07/31/CDxdv.png)
+
+![](https://i2.imgu.cc/images/2022/07/31/CDuRL.png)
+
+##### PCB图：
+
+![](https://i2.imgu.cc/images/2022/07/31/CD7CZ.png)
+
+##### 实物图：
+
+<img src="https://i2.imgu.cc/images/2022/08/12/CMHy3.jpg" style="zoom:50%;" />
+
+<center>未更正</center>
+
+<img src="https://i2.imgu.cc/images/2022/08/14/CM1tt.jpg" style="zoom:10%;" />
+
+<center>飞线后</center>
 
 ------
 
+### 其他一些解读：
+
+**ESP-HMI**配有~~极为先进的~~**USB Type-C**接口，作为供电和通信。
+
+**SW7**为DC-DC芯片的使能开关，实现小开关控制大功率开关。
+
+**U9**连接的为震动马达。
+
+**SW3**连接**IO35**，可以自由配置为**中断引脚**或其他功能。
+
+板载**5V、3.3V、BAT、SDA、SCL**触点，方便调试。
+
+------
+
+### BOM表：
+
+| ID   | Name                   | Designator                  | Footprint                                          | Price  |
+| ---- | ---------------------- | :-------------------------- | -------------------------------------------------- | ------ |
+| 1    | 10uF                   | C1,C5                       | C0603                                              |        |
+| 2    | 1uF                    | C2                          | C0603                                              | 0.0391 |
+| 3    | 22pF                   | C3                          | C0603                                              | 0.0573 |
+| 4    | 0.1uF                  | C12                         | C0603                                              | 3.29   |
+| 5    | 1uF                    | C15                         | C0603                                              | 0.0351 |
+| 6    | 15pF                   | C16,C17                     | C0603                                              | 0.0883 |
+| 7    | 22uF                   | C4,C11                      | C0805                                              | 3.29   |
+| 8    | 0.1u                   | C6                          | 1206                                               |        |
+| 9    | 100nF/50V              | C7,C9                       | 0603_C_JX                                          |        |
+| 10   | 10μF/10V               | C8,C10                      | 0805_C_JX                                          |        |
+| 11   | 104                    | C13,C18                     | C0805                                              |        |
+| 12   | 100nF                  | C14                         | 603                                                | 0.0082 |
+| 13   | 104                    | C19,C22                     | C 0603                                             |        |
+| 14   | 103                    | C20                         | C 0603                                             |        |
+| 15   | 2.2NF                  | C21                         | C 0603                                             |        |
+| 16   | 104                    | C23                         | C0603                                              |        |
+| 17   | 1uF                    | C24                         | C0603                                              | 0.032  |
+| 18   | HYC77-TF09-200         | CARD1                       | TF-SMD_HYC77-TF09-200                              | 0.9401 |
+| 19   | PJ-327A 5JJ            | CN1                         | AUDIO-SMD_PJ-327A5JJ                               | 0.5698 |
+| 20   | IN4007                 | D1,D2                       | SMA_L4.3-W2.6-LS5.1-RD                             |        |
+| 21   | 触点                   | 5V,BAT,3.3V,SDA,SCL         | 触点                                               |        |
+| 22   | 2.2UH_0520             | L1                          | IND-SMD_L2.5-W2.0                                  |        |
+| 23   | AFC07-S40ECA-00        | LCD1                        | FPC-SMD_P0.50-40P_LCS-SJ-H2.0                      | 1.1266 |
+| 24   | Red/LED                | LED1                        | 0603_D_JX                                          |        |
+| 25   | Green/LED              | LED2                        | 0603_D_JX                                          |        |
+| 26   | S8050                  | Q1,Q2                       | SOT-23-3_L2.9-W1.3-P1.90-LS2.4-BR                  | 0.0702 |
+| 27   | RU8205C6               | Q3                          | SOT-23-6                                           | 0.3144 |
+| 28   | S8050LT1-J3Y           | Q5                          | SOT-23_L2.9-W1.3-P1.90-LS2.4-BR                    | 0.1207 |
+| 29   | 220R                   | R1,R2                       | R0603                                              |        |
+| 30   | 10k                    | R4,R5,R6,R7,R29             | R0603                                              |        |
+| 31   | 1k                     | R3                          | 805                                                |        |
+| 32   | 100                    | R8                          | 805                                                |        |
+| 33   | 0.25R/1%               | R9                          | 1206_R_JX                                          |        |
+| 34   | 10k/1%                 | R10                         | 0603_R_JX                                          |        |
+| 35   | 2k/1%                  | R11                         | 0603_R_JX                                          |        |
+| 36   | 1.2k/1%                | R12                         | 0805-R                                             |        |
+| 37   | 45K                    | R13                         | R0603                                              | 0.0135 |
+| 38   | 10K                    | R14,R15,R16,R17,R18,R19,R25 | R0603                                              | 0.0132 |
+| 39   | 100kΩ                  | R21                         | R0603                                              | 0.0075 |
+| 40   | 10K                    | R20,R22,R23                 | R0402                                              | 0.0038 |
+| 41   | 10k                    | R24                         | R0805                                              |        |
+| 42   | 1k                     | R26                         | R0603                                              |        |
+| 43   | 10K                    | R27                         | R0603                                              |        |
+| 44   | 10K                    | R28                         | R 0603                                             |        |
+| 45   | 10K                    | R30                         | RES-ADJ-TH_R1001B                                  | 0.504  |
+| 46   | 10k                    | R31,R32                     | R0603                                              | 0.0066 |
+| 47   | TA-3525-A1             | SW1,SW2,SW4,SW7             | SW-SMD_3P-L9.1-W3.5-P2.50-EH6.8                    | 0.8578 |
+| 48   | TS-KG012EV             | SW3,SW5,SW6                 | SW-SMD_TS-KG012EV                                  | 0.3602 |
+| 49   | CH340C                 | U1                          | SOP-16_L10.0-W3.9-P1.27-LS6.0-BL                   | 2.66   |
+| 50   | ESP32-WROVER-E(4MB)    | U2                          | WIFIM-SMD_39P-L31.4-W18.0-P1.27                    | 33.11  |
+| 51   | PW2053                 | U3                          | SOT-23-5_L2.9-W1.6-P0.95-LS2.8-BL                  |        |
+| 52   | 3P金手指               | BAT,U9,U12                  | 3P金手指                                           |        |
+| 53   | TP4056_JX              | U5                          | SOP8_150MIL_JX                                     |        |
+| 54   | PCF8563M/TR            | U6                          | SOP-8_L4.9-W3.9-P1.27-LS6.0-BL                     | 1.1374 |
+| 55   | DW01+                  | U7                          | SOT-23-6-L                                         |        |
+| 56   | SHT30-DIS-B            | U8                          | DFN-8_L2.5-W2.5-P0.50-BL-EP                        | 6.48   |
+| 57   | WT8302-MSOP-8          | U10                         | MSOP-8_L3.0-W3.0-P0.65-LS4.9-BL                    |        |
+| 58   | MPU-6050-24PIN-4*4*0.9 | U13                         | QFN24                                              |        |
+| 59   | XPT2046                | U14                         | TSSOP-16_L5.0-W4.4-P0.65-LS6.4-BL                  | 3.31   |
+| 60   | TYPE-C16PIN            | USB1                        | USB-C-SMD_TYPE-C16PIN                              | 1.5593 |
+| 61   | -                      | X2                          | OSC-SMD_BD2.0-P2.54_TMXLI-206F32.768KHZ12.5PF20PPM | 1.2412 |
+
+------
+
+## ESP-HMI 软件
+
 ### 软件：
 
-本人一切嵌入式皆为自学，~~原谅我写成屎山或执行效率不高~~
+本人一切嵌入式皆为**自学**，~~原谅我写成屎山或执行效率不高~~
 
-[Media_Player.h](https://github.com/SoTWild/ESP-HMI/blob/main/ESP32-HMI/include/Media_Player.h) 这里是**主要**函数：
+------
+
+### 主要函数：
+
+[Media_Player.h](https://github.com/SoTWild/ESP-HMI/blob/main/ESP32-HMI/include/Media_Player.h) 中：
 
 ```c
 void Mjpeg_start(const char *MJPEG_FILENAME, const char *AUDIO_FILENAME);
@@ -115,29 +293,39 @@ void Mjpeg_start(const char *MJPEG_FILENAME, const char *AUDIO_FILENAME);
 
 这是进行 **Mjpeg** 视频播放，源代码由[Play Video With ESP32](https://www.instructables.com/Play-Video-With-ESP32/)修改而来，详情见[MjpegClass.h](https://github.com/SoTWild/ESP-HMI/blob/main/ESP32-HMI/include/MjpegClass.h)。
 
+
+
 ```c
 void drawSdJpeg(const char *filename, int xpos, int ypos);
 ```
 
 这是绘制 **.jpg** 格式图片，源代码由[Bodmer/JPEGDecoder](https://github.com/Bodmer/JPEGDecoder)修改而来。
 
+
+
 ```c
 void MP3_start(const char *filename);
 ```
 
-这是进行 .mp3 格式音频的播放，源代码由[ESP8266Audio](https://github.com/earlephilhower/ESP8266Audio)修改而来。
+这是进行 **.mp3** 格式音频的播放，源代码由[ESP8266Audio](https://github.com/earlephilhower/ESP8266Audio)修改而来。
+
+
 
 ```c
 void PCM_start(const char *AUDIOFILENAME);
 ```
 
-这是进行 .pcm 格式音频的播放，源代码由[Play Video With ESP32](https://www.instructables.com/Play-Video-With-ESP32/)修改而来。
+这是进行 **.pcm** 格式音频的播放，源代码由[Play Video With ESP32](https://www.instructables.com/Play-Video-With-ESP32/)修改而来。
+
+
 
 ```c
 String readFileLine(const char* path, int num);
 ```
 
-读取 .txt 文本的某一行，源代码来自[peng-zhihui/HoloCubic](https://github.com/peng-zhihui/HoloCubic)。
+读取 **.txt** 文本的某一行，源代码来自[peng-zhihui/HoloCubic](https://github.com/peng-zhihui/HoloCubic)。
+
+
 
 ```c
 void BleAudio();
@@ -147,21 +335,77 @@ void BleAudio();
 
 
 
+```c
+void CreatCrollWords(int IWIDTH, int IHEIGHT, int WAIT, int X, int Y,int size,int font, uint16_t TextColor, String msg);
+```
+
+创建滚动文字，修改自[TFT_eSPI](https://github.com/Bodmer/TFT_eSPI)。
+
+
+
+```c
+void GetfromMometer();
+```
+
+从SHT30获得温湿度数据，修改自[SHT3x: Arduino library for Sensorion SHT3x](https://github.com/Risele/SHT3x)。
+
+
+
+```c
+void getNetTime();
+```
+
+获取网络时间，修改自[NTPClient](https://github.com/arduino-libraries/NTPClient)。
+
+
+
+```c
+void WiFiInit(String Mode);
+```
+
+初始化网络，可选STA/AP模式。
+
+
+
+```c
+void File_transfer_init();
+```
+
+无线文件传输功能，修改自[教你做一个ESP32-SD卡服务器_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1r34117746)
+
+------
+
 [Main.h](https://github.com/SoTWild/ESP-HMI/blob/main/ESP32-HMI/include/Main.h) 这是应用：
 
-> Album 相册
->
-> Game 小游戏
->
 > Sounder 音乐播放器
 >
 > Vision 视频播放器
 >
+> 画图
+>
 > Ebook 电子书阅读器
 >
+> Game 小游戏
+>
+> Album 相册
+>
 > Settings 设置
+>
+> Calculator计算器、函数绘图器
+>
+> Thermometer温湿度计
+>
+> 文件上传
+>
+> 网络
+>
+> 任务管理器（资源查看器）
 
+------
 
+[MjpegClass.h](https://github.com/SoTWild/ESP-HMI/blob/main/ESP32-HMI/include/MjpegClass.h) 这是mjpeg解码库。
+
+------
 
 [main.cpp](https://github.com/SoTWild/ESP-HMI/blob/main/ESP32-HMI/src/main.cpp) 开机时执行的程序，包括：
 
@@ -177,7 +421,208 @@ void BleAudio();
 >
 > 6）读取设置文件
 >
-> 7）运行 MainPage(); 主页程序
+> 7）用户登录
+>
+> 8）运行 MainPage(); 主页程序
 
 ------
 
+### 应用：
+
+#### Sounder 音乐播放器：
+
+需要**两个**文件夹，分别存放音乐**JPG**封面图片（可选）和**MP3**音乐文件。
+
+```c
+/User/登录的用户名/Data/Music/MusicCover/xxx.jpg
+```
+
+```c
+/User/登录的用户名/Data/Music/MusicData/xxx.mp3
+```
+
+特点：只要添加（合适）名称的.mp3文件和**同名**的封面文件，系统即可**自动识别**音乐文件和封面文件。
+
+**核心**实现方法：依靠以下函数每次**开机**时**读取指定位置的文件**并将**文件路径**写入**对应的配置文件**中。
+
+然后系统调用`readFileLine();`函数读取配置文件，得到目标文件位置。
+
+```c
+void listDir(fs::FS &fs, const char * dirname, uint8_t levels);
+```
+
+```c
+void appendDir(fs::FS &fs, const char * dirname, String filename, uint8_t levels);
+```
+
+**配置文件**路径，分别是封面路径和音乐路径：
+
+```c
+/User/登录的用户名/Config/MusicCoverConfig.txt
+```
+
+```c
+/User/登录的用户名/Config/MusicConfig.txt
+```
+
+注：系统首先通过**截取字符串**从**读取到的**文件路径中获取**文件名**，用户选中文件名后再填补出文件路径。
+
+> 取字符串的前i个字符：`str=str.substring(0,i);`
+>
+> 去掉字符串的前i个字符：`str=str.substring(i);` 
+>
+> 从右边开始取i个字符：`str=str.substring(str.length()-i);` `str=str.substring(str.length()-i,str.length());`
+>
+> 从右边开始去掉i个字符：`str=str.substring(0,str.Length-i);`
+>
+> [常用的字符串截取方法](https://blog.csdn.net/xinyuezitang/article/details/88850802)
+
+`sizeof(str)`获取字符串**长度**。
+
+`(str).c_str()`String转char。
+
+#### Vision 视频播放器：
+
+和Sounder的实现方法**大同小异**，添加了显示封面图片的功能。
+
+#### 画图：
+
+修改自**TFT_Touch**库中的**Draw**实例。
+
+#### Ebook 电子书阅读器：
+
+和Sounder的实现方法**大同小异**，添加了显示封面图片的功能。
+
+读取文件函数为`String readFileLine(const char* path, int num);`
+
+#### Game 小游戏：
+
+移植了同人作品**《玩弄蕾米莉亚的红色恶魔晚餐》**中**“咲夜时停搬物”**游戏。
+
+~~相当简单~~
+
+#### Album 相册：
+
+和Sounder的实现方法**大同小异**。
+
+#### Settings 设置：
+
+待修改完善。
+
+#### Calculator计算器、函数绘图器：
+
+核心函数`String::toFloat(void)`触摸键盘添加字符串，再将字符串转换为可运算的数据类型。
+
+**某些计算会有误差**
+
+函数绘图器未编写完成。
+
+#### Thermometer温湿度计：
+
+单纯刷屏
+
+#### 文件上传：
+
+修改自[教你做一个ESP32-SD卡服务器](https://www.bilibili.com/video/BV1r34117746)，添加了**在线查看**功能、不同用户**分区**功能、用户名密码**登录**功能。
+
+#### 网络：
+
+可以选择**AP**模式或**STA**模式。
+
+#### 任务管理器（资源查看器）：
+
+###### 显示内容：
+
+> CPU：频率、运行时间
+>
+> RAM：芯片RAM、SPI RAM
+>
+> ROM：Flash大小、Flash速度、SD卡大小
+>
+> Battery：电池电压、剩余百分比、预计使用时间
+>
+> WiFi：当前模式、IP地址、SSID、MAC地址
+>
+> Temperature：温度（不是CPU温度）
+
+后续会添加真正意义上的“任务管理”功能。
+
+------
+
+## ESP-HMI 注意事项：
+
+### 硬件：
+
+（1）PCB上要将**IO25与XPT2046的T_CLK断开**，**将T_CLK和IO0连接**。
+
+原因：**IO25**和**IO26**为**ESP32 DAC** 的两个通道，音频输出时与触摸屏时钟信号**冲突**，会导致音频播放时（后）无法触摸。
+
+（2）如果追求完美，建议重新设计**WT8302**和**PCF8563**的电路，并且将DC-DC设计在偏僻位置。
+
+原因：原设计有缺陷，根据**信号测量**可以判定**失败**。
+
+![](https://i2.imgu.cc/images/2022/08/14/CMzsv.jpg)
+
+![](https://i2.imgu.cc/images/2022/08/14/CMSiL.jpg)
+
+<center>电源纹波</center>
+
+![](https://i2.imgu.cc/images/2022/08/14/CM2BZ.jpg)
+
+<center>晶振波形，已经失控了</center>
+
+（3）音频质量有限，但还是能接受。
+
+原因：ESP32 DAC 精度为 **8-bit**，理论只可以输出**256**个值。
+
+![](https://i2.imgu.cc/images/2022/08/14/CM3bl.jpg)
+
+<center>放大后的音频波形</center>
+
+（4）在（1）中，断开IO25后，可以将其连接上耳机插座，实现双声道。
+
+原因：ESP32 中，IO25 为 **DAC Channel 1**，是**左**声道；IO26 为 **DAC Channel 2**，是**右**声道。原设计中耳机的**两声道并联**，由 **IO26** 提供**右**声道信号。
+
+------
+
+### 软件：
+
+（1）使用了两个TFT库（TFT_eSPI、Arduino GFX），分别负责**绘制GUI**和**播放Mjpeg视频**。
+
+原因：TFT_eSPI用得比较熟悉……<img src="https://i0.hdslb.com/bfs/emote/3087d273a78ccaff4bb1e9972e2ba2a7583c9f11.png" style="zoom:20%;" />
+
+------
+
+### 其他：
+
+#### Special Thanks：
+
+[moononournation/Arduino_GFX: Arduino GFX developing for various color displays and various data bus interfaces (github.com)](https://github.com/moononournation/Arduino_GFX)
+
+[Bodmer/JPEGDecoder: A JPEG decoder library (github.com)](https://github.com/Bodmer/JPEGDecoder)
+
+[earlephilhower/ESP8266Audio: Arduino library to play MOD, WAV, FLAC, MIDI, RTTTL, MP3, and AAC files on I2S DACs or with a software emulated delta-sigma DAC on the ESP8266 and ESP32 (github.com)](https://github.com/earlephilhower/ESP8266Audio)
+
+[peng-zhihui/HoloCubic: 带网络功能的伪全息透明显示桌面站 (github.com)](https://github.com/peng-zhihui/HoloCubic)
+
+[pschatzmann/ESP32-A2DP: A Simple ESP32 Bluetooth A2DP Library (to implement a Music Receiver or Sender) that supports Arduino, PlatformIO and Espressif IDF (github.com)](https://github.com/pschatzmann/ESP32-A2DP)
+
+[Bodmer/TFT_eSPI: Arduino and PlatformIO IDE compatible TFT library optimised for the Raspberry Pi Pico (RP2040), STM32, ESP8266 and ESP32 that supports different driver chips (github.com)](https://github.com/Bodmer/TFT_eSPI)
+
+[Risele/SHT3x: Arduino library for Sensorion SHT3x humidity and temperature sensors (SHT30, SHT31, SHT35). (github.com)](https://github.com/Risele/SHT3x)
+
+[arduino-libraries/NTPClient: Connect to a NTP server (github.com)](https://github.com/arduino-libraries/NTPClient)
+
+[教你做一个ESP32-SD卡服务器_哔哩哔哩_bilibili](https://www.bilibili.com/video/BV1r34117746)
+
+另外有些出处找不到了，可以的话请告知我。
+
+#### 结语：
+
+该项目从**2021年09月05日**开始构思，目前为止基本要完成了。它几乎代表了我的最高技术力，希望该项目能为开源事业添砖加瓦。
+
+在开发过程中，也吸取不少经验和教训，我尽量分享出来，希望能帮助到各位。
+
+------
+
+<img src="https://i2.imgu.cc/images/2022/08/14/CMaaF.png" style="zoom:25%;" />

@@ -432,7 +432,7 @@ void MP3_start_Sounder(const char *afilename,String Musicname) {
 
   file = new AudioFileSourceFS(SD_MMC, afilename);
   out = new AudioOutputI2S(0, 1, 128);
-  //out -> SetGain(1.0); //max 4.0
+  out -> SetGain(1.0); //max 4.0
   mp3 = new AudioGeneratorMP3();
   mp3->begin(file, out);
   
