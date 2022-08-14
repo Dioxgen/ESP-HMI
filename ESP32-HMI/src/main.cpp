@@ -23,6 +23,8 @@
   2022/07/08 温度计
   2022/07/12 文件上传
   2022/07/14 WiFi
+  2022/08/13 添加Task Manager
+  2022/08/14 完成Album功能
 */
 
 //无线AP名称Teacher WiFi
@@ -52,11 +54,15 @@ void setup() {
   tft.setTextDatum(MC_DATUM);
   tft.setSwapBytes(true);
 
-  touch.setCal(481, 3395, 755, 3487, 480, 320, 1);
-  touch.setRotation(3);
+  touch.setCal(481, 3395, 755, 3487, 480, 320, 0);
+  touch.setRotation(1);
 
   pinMode(TFT_BL, OUTPUT);
   digitalWrite(TFT_BL, HIGH);
+  pinMode(35,INPUT_PULLUP);//interrupt
+  pinMode(34,INPUT);//Battery
+  //attachInterrupt(35, tft_BL, RISING);
+  
   /*
     ledcAttachPin(TFT_BL, 1);
     ledcSetup(1, 12000, 8);
@@ -78,8 +84,8 @@ void setup() {
     if (StartPrint){
       tft.println("SD card Ready!");
       tft.printf("SD.cardSize = %lluGB \n", SD_MMC.cardSize() / (1024 * 1024 * 1024));
-      tft.printf("SD.totalBytes = %lluGB \n", SD_MMC.totalBytes() / (1024 * 1024 * 1024));
-      tft.printf("SD.usedBytes = %lluGB \n", SD_MMC.usedBytes() / (1024 * 1024 * 1024));
+      tft.printf("SD.totalSize = %lluGB \n", SD_MMC.totalBytes() / (1024 * 1024 * 1024));
+      tft.printf("SD.usedSize = %lluGB \n", SD_MMC.usedBytes() / (1024 * 1024 * 1024));
       tft.printf("SD.cardType = %d \r\n", SD_MMC.cardType());
       delay(2000);
     }
@@ -118,6 +124,14 @@ void setup() {
 //  tft.println(readFileLine("/System/Settings/LastUser.txt", 1));
 //  tft.println(readFileLine("/User/SoTWild/Data/Others/password.txt", 1));
   }
+
+  //Demos:
+  //draw();
+  //WiFiInit("AP");
+  //File_transfer();
+  //DS1307();
+  //MPU_Setup();
+
   Userlogin();
   line = 1;
   tft.fillScreen(TFT_BLACK);

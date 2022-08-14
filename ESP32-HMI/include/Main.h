@@ -200,11 +200,12 @@ void Refresh() {
   Userdir = String("/User/") + User + String("/Config/VideoConfig.txt");
   filedir = String("/User/") + User + String("/Data/Video/VideoData");
   SD_MMC.remove(Userdir.c_str());
-  appendDir(SD_MMC, Userdir.c_str() , filedir, 3);/*
-  Userdir = String("/User/") + User + String("/Config/VideoCoverConfig.txt");
-  filedir = String("/User/") + User + String("/Data/Video/VideoCover");
+  appendDir(SD_MMC, Userdir.c_str() , filedir, 3);
+
+  Userdir = String("/User/") + User + String("/Config/ImageConfig.txt");
+  filedir = String("/User/") + User + String("/Data/Image");
   SD_MMC.remove(Userdir.c_str());
-  appendDir(SD_MMC, Userdir.c_str() , filedir, 2);*/
+  appendDir(SD_MMC, Userdir.c_str() , filedir, 3);
 }
 
 void NewUser(fs::FS &fs, const char *UserName) {
@@ -225,26 +226,163 @@ void NewUser(fs::FS &fs, const char *UserName) {
   file.close();
 }
 
+//Album
+void ImageCheck(int Imagenum){
+  Image_num = Imagenum;
+  tft.fillScreen(TFT_BLACK);
+  int strlen = 0;
+  String filename;
+
+  strlen = sizeof(User);
+  strlen = strlen + 13;
+  filedir = String ("/User/") + User + String("/Config/ImageConfig.txt");
+  filename = readFileLine(filedir.c_str(), Imagenum).substring(strlen);
+  filename = filename.substring(0,filename.length()-4);
+  ImageName = filename;
+  Serial.print("ImageName:");
+  Serial.println(ImageName);
+  
+  jpgdir = String ("/User/") + User + String("/Data/Image/") + ImageName + String(".jpg");
+  drawSdJpeg(jpgdir.c_str(), 0, 0);
+
+  while(1) {
+    if(touch.Pressed()) {
+      EnableIC = 1;
+      break;
+    }
+  }
+}
+void listImage(int ImagePage){
+  int strlen = 0;
+  
+  String filename;
+  
+  tft.fillScreen(TFT_WHITE);
+  tft.fillRoundRect(10,270, 460, 40, 8, TFT_BLUE);
+  tft.setCursor(25, 280);
+  tft.setTextColor(TFT_ORANGE);
+  tft.print("Previous");
+  tft.print("                    ");
+  tft.print("View");
+  tft.print("                           ");
+  tft.print("Next");
+  tft.setTextColor(TFT_DARKGREEN);
+
+  ImageBline = (ImagePage - 1) * 10 + 1;
+  ImageEline = ImageBline + 9;
+  strlen = strlen + 25;
+  Serial.printf("strlen: %d\n",strlen);
+  tft.setCursor(0,0);
+
+  tft.setTextColor(TFT_DARKGREEN);
+
+  while (ImageBline <= ImageEline) {
+    filename = readFileLine(filedir.c_str(), ImageBline).substring(strlen);
+    tft.println(filename.substring(0,filename.length()-4));
+    //Serial.println(filename.substring(0,filename.length()-4));
+    ImageBline++;
+    //Serial.println(ImageBline);
+  }
+  tft.setTextColor(TFT_BLACK);
+}
 void Album() {
-  jpgnum = 1;
-  while (1) {
+  int a = 55;
+  int strlen = 0;
+  String filename;
+
+  //tft.fillScreen(tft.color565(0, 233, 255));
+  tft.setTextSize(1);
+  tft.setTextColor(TFT_BLACK);
+
+  filedir = String ("/User/") + User + String("/Config/ImageConfig.txt");
+  strlen = sizeof(User);
+  
+  listImage(ImagePage);
+
+  while (1){
+
+    if(ImagePage < 1){
+      ImagePage = 1;
+      listImage(ImagePage);
+    }
     if (touch.Pressed()) {
-      tft.fillScreen(TFT_BLACK);
-      if (touch.X() < 240 ) {
-        jpgnum--;
-        if (jpgnum < 1) {
-          jpgnum = 1;
-        }
-        jpgdir = String ("/User/") + User + String("/Data/Image/") + jpgnum + String(".jpg");
-        drawSdJpeg(jpgdir.c_str(), 0, 0);
-      }
-      else if (240 < touch.X() && touch.X() < 440) {
-        jpgnum++;
-        jpgdir = String ("/User/") + User + String("/Data/Image/") + jpgnum + String(".jpg");
-        drawSdJpeg(jpgdir.c_str(), 0, 0);
-      }
-      else {
+      if ((460 < touch.X()) && (touch.X() < 480) && (0 < touch.Y()) && (touch.Y() < 20)) {
         break;
+      }
+      else if ((20 < touch.X()) && (touch.X() < 200) && (280 < touch.Y()) && (touch.Y() < 320)) {
+        ImagePage--;
+        listImage(ImagePage);
+      }
+      else if ((220 < touch.X()) && (touch.X() < 260) && (280 < touch.Y()) && (touch.Y() < 320)) {
+        ImageCheck(Imagenum);
+      }
+      else if ((280 < touch.X()) && (touch.X() < 480) && (280 < touch.Y()) && (touch.Y() < 320)) {
+        ImagePage++;
+        listImage(ImagePage);
+      }
+      else if (0 < touch.Y() && touch.Y() < 30){
+        tft.drawRect(-1, a, 479, 27, TFT_WHITE);
+        tft.drawRect(-1, 1, 479, 27, TFT_BLACK);
+        Imagenum = (ImagePage -1) * 10 + 1;
+        a = 1;
+      }
+      else if (30 < touch.Y() && touch.Y() < 60){
+        tft.drawRect(-1, a, 479, 27, TFT_WHITE);
+        tft.drawRect(-1, 28, 479, 27, TFT_BLACK);
+        Imagenum = (ImagePage -1) * 10 + 2;
+        a = 28;
+      }
+      else if (60 < touch.Y() && touch.Y() < 90){
+        tft.drawRect(-1, a, 479, 27, TFT_WHITE);
+        tft.drawRect(-1, 53, 479, 27, TFT_BLACK);
+        Imagenum = (ImagePage -1) * 10 + 3;
+        a = 53;
+      }
+      else if (90 < touch.Y() && touch.Y() < 116){
+        tft.drawRect(-1, a, 479, 27, TFT_WHITE);
+        tft.drawRect(-1, 80, 479, 27, TFT_BLACK);
+        Imagenum = (ImagePage -1) * 10 + 4;
+        a = 80;
+      }
+      else if (116 < touch.Y() && touch.Y() < 142){
+        tft.drawRect(-1, a, 479, 27, TFT_WHITE);
+        tft.drawRect(-1, 105, 479, 27, TFT_BLACK);
+        Imagenum = (ImagePage -1) * 10 + 5;
+        a = 105;
+      }
+      else if (142 < touch.Y() && touch.Y() < 168){
+        tft.drawRect(-1, a, 479, 27, TFT_WHITE);
+        tft.drawRect(-1, 130, 479, 27, TFT_BLACK);
+        Imagenum = (ImagePage -1) * 10 + 6;
+        a = 130;
+      }
+      else if (168 < touch.Y() && touch.Y() < 194){
+        tft.drawRect(-1, a, 479, 27, TFT_WHITE);
+        tft.drawRect(-1, 156, 479, 27, TFT_BLACK);
+        Imagenum = (ImagePage -1) * 10 + 7;
+        a = 156;
+      }
+      else if (194 < touch.Y() && touch.Y() < 220){
+        tft.drawRect(-1, a, 479, 27, TFT_WHITE);
+        tft.drawRect(-1, 182, 479, 27, TFT_BLACK);
+        Imagenum = (ImagePage -1) * 10 + 8;
+        a = 182;
+      }
+      else if (220 < touch.Y() && touch.Y() < 246){
+        tft.drawRect(-1, a, 479, 27, TFT_WHITE);
+        tft.drawRect(-1, 208, 479, 27, TFT_BLACK);
+        Imagenum = (ImagePage -1) * 10 + 9;
+        a = 208;
+      }
+      else if (246 < touch.Y() && touch.Y() < 270){
+        tft.drawRect(-1, a, 479, 27, TFT_WHITE);
+        tft.drawRect(-1, 234, 479, 27, TFT_BLACK);
+        Imagenum = (ImagePage -1) * 10 + 10;
+        a = 234;
+      }
+      if(EnableIC == 1) {
+        EnableIC = 0;
+        listImage(ImagePage);
       }
     }
   }
@@ -294,6 +432,7 @@ void MP3_start_Sounder(const char *afilename,String Musicname) {
 
   file = new AudioFileSourceFS(SD_MMC, afilename);
   out = new AudioOutputI2S(0, 1, 128);
+  //out -> SetGain(1.0); //max 4.0
   mp3 = new AudioGeneratorMP3();
   mp3->begin(file, out);
   
@@ -301,6 +440,7 @@ void MP3_start_Sounder(const char *afilename,String Musicname) {
     if (mp3->isRunning()) {
       CreatCrollWords(450,30,0,300,40,1,4,TFT_WHITE,Musicname);
       if (touch.Pressed()) {
+        Serial.println("Pressed");
         if (300 < touch.X() && touch.X() < 450 && 100 < touch.Y() && touch.Y() < 140){
           mp3->stop();
           //Serial.print("Before:");
@@ -311,7 +451,7 @@ void MP3_start_Sounder(const char *afilename,String Musicname) {
           EnableMC = 1;
           break;
         }
-        else if (300 < touch.X() && touch.X() < 450 && 170 < touch.Y() && touch.Y() < 210){
+        else if (((300 < touch.X()) && (touch.X() < 450)) && ((170 < touch.Y()) && (touch.Y() < 210))){
           mp3->stop();
           //Serial.printf("MP3 done\n");
           MusicPage = -1;
@@ -1033,7 +1173,7 @@ void Calculator(){
   tft.setRotation(0);
   tft.setTextColor(TFT_WHITE);
   tft.setTextSize(1);
-  touch.setRotation(2);
+  touch.setRotation(0);
   drawSdJpeg("/System/Widgets/Calculator_kb.jpg", 0, 0);
   tft.setCursor(185,125);
   tft.print("Back / Clear");
@@ -1337,7 +1477,7 @@ void Calculator(){
         tft.setTextSize(1);
         tft.setTextColor(TFT_WHITE);
         tft.setCursor(1, 270);
-        touch.setRotation(3);
+        touch.setRotation(0);
 
         drawSdJpeg("/System/Widgets/Coordinate_axis.jpg", 0, 0);
         tft.fillCircle(20,280,20,TFT_ORANGE);
@@ -1365,7 +1505,7 @@ void Calculator(){
       else if (255 < X_Coord && X_Coord < 320 && 100 < Y_Coord && Y_Coord < 140) {// C
         tft.setTextColor(TFT_WHITE);
         tft.setTextSize(1);
-        touch.setRotation(2);
+        touch.setRotation(0);
         drawSdJpeg("/System/Widgets/Calculator_kb.jpg", 0, 0);
         tft.setCursor(185,125);
         tft.print("Back / Clear");
@@ -1404,7 +1544,7 @@ void Calculator(){
       }
       else if (0 < X_Coord && X_Coord < 30 && 0 < Y_Coord && Y_Coord < 30) {
         tft.setRotation(1);
-        touch.setRotation(3);
+        touch.setRotation(0);
         break;
       }
       delay(250);
@@ -1466,8 +1606,7 @@ void Thermometer(){
     tft.print(Temperature);
     tft.setTextColor(TFT_WHITE);
     tft.setCursor(250,10);
-    tft.print(" '");
-    tft.println("C");
+    tft.println(" 'C");
 
     tft.setCursor(10,40);
     tft.setTextColor(TFT_RED);
@@ -1609,6 +1748,214 @@ void Network(){
   }
 }
 
+//Task Manager
+void Task_Manager(){
+  drawSdJpeg("/System/APP/Task_Manager/Task_Manager_CPU.jpg", 0, 0);
+  tft.setTextColor(TFT_BLACK);
+  ViewTask = 1;
+  int Drawed1 = 0;
+  int Drawed2 = 0;
+  int Drawed3 = 0;
+  int Drawed4 = 0;
+  int Drawed5 = 0;
+  int Drawed6 = 0;
+
+  while(1) {
+    if(ViewTask == 1) {
+      if(Drawed1 == 0) {
+        drawSdJpeg("/System/APP/Task_Manager/Task_Manager_CPU.jpg", 0, 0);
+        Drawed1 = 1;
+        Drawed2 = 0;
+        Drawed3 = 0;
+        Drawed4 = 0;
+        Drawed5 = 0;
+        Drawed6 = 0;
+      }
+      tft.setCursor(65,50);
+      tft.print("CPU Frequency: ");
+      tft.print(ESP.getCpuFreqMHz());
+      tft.print(" MHz");
+      tft.setCursor(65,80);
+      tft.printf("Run time: %ld Minutes", millis() / 60000);
+    }
+    else if(ViewTask == 2) {
+      if(Drawed2 == 0) {
+        drawSdJpeg("/System/APP/Task_Manager/Task_Manager_RAM.jpg", 0, 0);
+        Drawed1 = 0;
+        Drawed2 = 1;
+        Drawed3 = 0;
+        Drawed4 = 0;
+        Drawed5 = 0;
+        Drawed6 = 0;
+      }
+      tft.setCursor(65,50);
+      tft.printf("Internal RAM total size: %u KB", ESP.getHeapSize() / 1024);
+
+      tft.setCursor(65,80);
+      tft.printf("Available heap size: %u KB", ESP.getFreeHeap() / 1024);
+
+      tft.setCursor(65,110);
+      tft.printf("SPI RAM: %u KB", ESP.getPsramSize() / 1024);
+      
+      tft.setCursor(65,140);
+      tft.printf("Available heap: %u KB", ESP.getFreePsram() / 1024);
+      /*
+      IRAM_Usage = printf("%ld",(long)ESP.getHeapSize()) - printf("%ld",(long)ESP.getFreeHeap());
+      Serial.println(IRAM_Usage);
+      IRAM_Usage = IRAM_Usage / printf("%ld",(long)ESP.getHeapSize());
+      Serial.println(IRAM_Usage);
+      SRAM_Usage = printf("%ld",(long)ESP.getPsramSize()) - printf("%ld",(long)ESP.getFreePsram());
+      SRAM_Usage = SRAM_Usage / printf("%ld",(long)ESP.getPsramSize());
+      Serial.println(IRAM_Usage);
+      Serial.println(SRAM_Usage);
+      */
+      tft.fillRect(65,180,200,130,tft.color565(255, 238, 133));
+      tft.fillRect(65,180,200 * IRAM_Usage,130,tft.color565(255, 220, 0));
+
+      tft.fillRect(270,180,200,130,tft.color565(255, 238, 133));
+      tft.fillRect(270,180,200 * SRAM_Usage,130,tft.color565(255, 220, 0));
+    }
+    else if(ViewTask == 3) {
+      if(Drawed3 == 0) {
+        drawSdJpeg("/System/APP/Task_Manager/Task_Manager_ROM.jpg", 0, 0);
+        Drawed1 = 0;
+        Drawed2 = 0;
+        Drawed3 = 1;
+        Drawed4 = 0;
+        Drawed5 = 0;
+        Drawed6 = 0;
+      }
+      tft.setCursor(65,50);
+      tft.printf("Flash Size: %u KB", ESP.getFlashChipSize() / 1024);
+
+      tft.setCursor(65,80);
+      tft.printf("Speed: %u MHz", ESP.getFlashChipSpeed() / 1000000);
+
+      tft.setCursor(65,110);
+      tft.printf("SD.totalSize = %llu GB", SD_MMC.totalBytes() / (1024 * 1024 * 1024));
+
+      tft.setCursor(65,140);
+      tft.printf("SD.usedSize = %llu GB", SD_MMC.usedBytes() / (1024 * 1024 * 1024));
+
+      tft.fillRect(65,180,200,130,tft.color565(162, 255, 150));
+      tft.fillRect(65,180,200 * IRAM_Usage,130,tft.color565(30, 255, 0));
+
+      tft.fillRect(270,180,200,130,tft.color565(162, 255, 150));
+      tft.fillRect(270,180,200 * SRAM_Usage,130,tft.color565(30, 255, 0));
+    }
+    else if(ViewTask == 4) {
+      if(Drawed4 == 0) {
+        drawSdJpeg("/System/APP/Task_Manager/Task_Manager_Battery.jpg", 0, 0);
+        Drawed1 = 0;
+        Drawed2 = 0;
+        Drawed3 = 0;
+        Drawed4 = 1;
+        Drawed5 = 0;
+        Drawed6 = 0;
+      }
+      tft.setCursor(65,50);
+      tft.print("Battery Voltage: ");
+      tft.setTextColor(TFT_WHITE);
+      tft.print(BatteryVol);
+      tft.setTextColor(TFT_BLACK);
+      tft.print(" V");
+      ADC_VALUE = analogRead(34);
+      //Serial.println(BatteryVol);
+      BatteryVol = (ADC_VALUE * 3.3 * 2 ) / (4095);
+      //Serial.println(BatteryVol);
+      tft.setCursor(65,50);
+      tft.print("Battery Voltage: ");
+      tft.print(BatteryVol);
+      tft.print(" V");
+    }
+    else if(ViewTask == 5) {
+      if(Drawed5 == 0) {
+        drawSdJpeg("/System/APP/Task_Manager/Task_Manager_WiFi.jpg", 0, 0);
+        Drawed1 = 0;
+        Drawed2 = 0;
+        Drawed3 = 0;
+        Drawed4 = 0;
+        Drawed5 = 1;
+        Drawed6 = 0;
+      }
+      tft.setCursor(65,50);
+      if (WiFiMode == "STA") {
+        tft.print("WiFi Mode: STA");
+        tft.setCursor(65,80);
+        tft.print("Got IP: ");
+        tft.print(WiFi.localIP());
+        tft.setCursor(65,110);
+        tft.print("Station interface MAC address: ");
+        tft.setCursor(65,140);
+        tft.print(WiFi.macAddress());
+        tft.setCursor(65,170);
+        tft.print("Connected to: ");
+        tft.print(WiFi.SSID());
+      }
+      else if (WiFiMode == "AP") {
+        tft.print("WiFi Mode: AP");
+        tft.setCursor(65,80);
+        tft.print("Got IP: ");
+        tft.print(WiFi.softAPIP());
+        tft.setCursor(65,110);
+        tft.print("SSID: ");
+        tft.print(ssid);
+      }
+      else {
+        tft.print("WiFi Unconnected");
+      }
+    }
+    else if(ViewTask == 6) {
+      if(Drawed6 == 0) {
+        drawSdJpeg("/System/APP/Task_Manager/Task_Manager_Temperature.jpg", 0, 0);
+        Drawed1 = 0;
+        Drawed2 = 0;
+        Drawed3 = 0;
+        Drawed4 = 0;
+        Drawed5 = 0;
+        Drawed6 = 1;
+      }
+      tft.setCursor(65,50);
+      tft.print("Temperature: ");
+      tft.setTextColor(TFT_WHITE);
+      tft.print(Temperature);
+      tft.print(" 'C");
+      Sensor.UpdateData();
+      Temperature = Sensor.GetTemperature();
+      tft.setCursor(65,50);
+      tft.setTextColor(TFT_BLACK);
+      tft.print("Temperature: ");
+      tft.print(Temperature);
+      tft.print(" 'C");
+    }
+    if(touch.Pressed()) {
+      if(0 < touch.X() && touch.X() < 50) {
+        if(0 < touch.Y() && touch.Y() < 50) {
+          ViewTask = 1;
+        }
+        if(50 < touch.Y() && touch.Y() < 100) {
+          ViewTask = 2;
+        }
+        else if(100 < touch.Y() && touch.Y() < 150) {
+          ViewTask = 3;
+        }
+        else if(150 < touch.Y() && touch.Y() < 200) {
+          ViewTask = 4;
+        }
+        else if(200 < touch.Y() && touch.Y() < 250) {
+          ViewTask = 5;
+        }
+        else if(250 < touch.Y() && touch.Y() < 300) {
+          ViewTask = 6;
+        }
+      }
+      else if(440 < touch.X() && touch.X() < 480 && 0 < touch.Y() && touch.Y() < 40) {
+        break;
+      }
+    }
+  }
+}
+
 //Desktop
 void DrawAPP() {
   tft.fillRect(0, 30, 400, 270, tft.color565(0, 0, 30));
@@ -1626,6 +1973,7 @@ void DrawAPP() {
     drawSdJpeg("/System/APP/Thermometer/Thermometer.jpg", 25, 55);
     drawSdJpeg("/System/APP/File_transfer/File_transfer.jpg", 115, 55);
     drawSdJpeg("/System/APP/Network/Network.jpg", 205, 55);
+    drawSdJpeg("/System/APP/Task_Manager/Task_Manager.jpg", 295, 55);
   }
   tft.fillRoundRect(25,255,80,20,5,TFT_DARKGREY);
   tft.fillRoundRect(295,255,80,20,5,TFT_DARKGREY);
@@ -1637,6 +1985,7 @@ void DrawAPP() {
 }
 void MainPage() {
   tft.setCursor(0, 300, 4);
+  touch.setRotation(1);
 
   jpgdir = String ("/User/") + User + String("/Data/Others/") + String("Desktop.jpg");
   if (SD_MMC.exists(jpgdir.c_str())){
@@ -1737,6 +2086,11 @@ void MainPage() {
                   tft.fillScreen(TFT_BLACK);
                   delay(100);
                   Network();
+                }
+                else if (295 < X_Coord && X_Coord < 375 && 55 < Y_Coord && Y_Coord < 135){
+                  tft.fillScreen(TFT_BLACK);
+                  delay(100);
+                  Task_Manager();
                 }
               }
             }

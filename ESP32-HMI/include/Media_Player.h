@@ -13,6 +13,7 @@ String VideoName;
 String BookName;
 String str_CalNum1;
 String str_CalNum2;
+String ImageName;
 
 int Mainpage = 1;
 int MS_num;
@@ -41,15 +42,28 @@ int UserEline;
 int b;
 int decimal_point = 0;
 int inputNum = 1;
-int Operation_mode = 1;//1-add 2-subtract 3-multiply 4-divide
-int Cal_negative = 0;//判断是否已经输入负数
+int Operation_mode = 1;   //1-add 2-subtract 3-multiply 4-divide
+int Cal_negative = 0;   //判断是否已经输入负数
 int Operation_mode_change = 0;
+int ViewTask;   //1-CPU 2-RAM 3-ROM 4-BAT 5-WiFi 6-Temp
+int ImagePage = 1;
+int Imagenum = 1;
+int Image_num = 1;
+int ImageBline;
+int ImageEline;
+int EnableIC = 0;
 
 float CalNum1 = 0;
 float CalNum2 = 0;
 float CalResult = 0;
+float IRAM_Usage = 0;
+float SRAM_Usage = 0;
+float ROM_Usage = 0;
+float ADC_VALUE = 0;
+float BatteryVol = 0;
 
 bool notice;
+bool TFT_bl_state = 1;
 String n_otice;
 
 //Mjpeg player:
@@ -94,7 +108,7 @@ void Mjpeg_start(const char *MJPEG_FILENAME, const char *AUDIO_FILENAME) {
     .mode = (i2s_mode_t)(I2S_MODE_MASTER | I2S_MODE_TX | I2S_MODE_DAC_BUILT_IN),
     .sample_rate = 44100,
     .bits_per_sample = I2S_BITS_PER_SAMPLE_16BIT,
-    .channel_format = I2S_CHANNEL_FMT_ONLY_RIGHT,
+    .channel_format = I2S_CHANNEL_FMT_ONLY_RIGHT,//IO26->Right Channel
     .communication_format = (i2s_comm_format_t)(I2S_COMM_FORMAT_PCM | I2S_COMM_FORMAT_I2S_MSB),
     .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1, // lowest interrupt priority
     // .dma_buf_count = 5,
@@ -479,7 +493,7 @@ unsigned int colors[10] = {TFT_RED, TFT_GREEN, TFT_BLUE, TFT_BLACK, TFT_CYAN, TF
 
 void draw() {
   tft.setRotation(1);
-  touch.setRotation(3);
+  touch.setRotation(1);
   tft.setTextSize(1);
   tft.fillScreen(TFT_BLACK);
   tft.setTextColor(TFT_GREEN);
@@ -500,6 +514,8 @@ void draw() {
     if (touch.Pressed()) {
       X_Coord = touch.X();
       Y_Coord = touch.Y();
+      Serial.println(X_Coord);
+      Serial.println(Y_Coord);
       if (Y_Coord < ColorPaletteHigh + 2) {
         if ((X_Coord / 32 > 7) && (X_Coord < 320)) {
           // Clear the screen to current colour
@@ -707,7 +723,7 @@ void BleAudio(){
       .mode = (i2s_mode_t) (I2S_MODE_MASTER | I2S_MODE_TX | I2S_MODE_DAC_BUILT_IN),
       .sample_rate = 44100,
       .bits_per_sample = (i2s_bits_per_sample_t) 16,
-      .channel_format =  I2S_CHANNEL_FMT_RIGHT_LEFT,
+      .channel_format =  I2S_CHANNEL_FMT_RIGHT_LEFT,//
       .communication_format = (i2s_comm_format_t)I2S_COMM_FORMAT_STAND_MSB,
       .intr_alloc_flags = 0,
       .dma_buf_count = 8,
@@ -1172,7 +1188,7 @@ uint32_t lastTime;
 void DS1307(){
   rtc.begin(); 
 // rtc.begin(sdapin, sclpin);                     
-  rtc.DSadjust(0, 19, 21, 2022, 3, 16); // 00:19:21 16 Mar 2022
+  rtc.DSadjust(0, 12, 10, 2022, 8, 13);
 // rtc.DSadjust(1647216003); // 00:00:03 14 Mar 2022
 // rtc.SetFont(0);                         //  language 0 = EN  |  1 = FR  |  2 = GR 
   while(1){
@@ -1213,5 +1229,46 @@ void DS1307(){
       Serial.println(rtc.DayofYear);          //  (int)     73    (0-365)
       Serial.println(""); 
       delay(1000);
+  }
+}
+
+//MPU6050
+#include <MPU6050_tockn.h>
+#include <Wire.h>
+
+MPU6050 mpu6050(Wire);
+
+void MPU_Setup(){
+  Wire.begin();
+  mpu6050.begin();
+  mpu6050.calcGyroOffsets(true);
+
+  while(1){
+    mpu6050.update();
+    
+    //Serial.println("=======================================================");
+    /*
+    Serial.print("temp : ");Serial.println(mpu6050.getTemp());
+    Serial.print("accX : ");Serial.print(mpu6050.getAccX());
+    Serial.print("\taccY : ");Serial.print(mpu6050.getAccY());
+    Serial.print("\taccZ : ");Serial.println(mpu6050.getAccZ());
+  
+    Serial.print("gyroX : ");Serial.print(mpu6050.getGyroX());
+    Serial.print("\tgyroY : ");Serial.print(mpu6050.getGyroY());
+    Serial.print("\tgyroZ : ");Serial.println(mpu6050.getGyroZ());
+  
+    Serial.print("accAngleX : ");Serial.print(mpu6050.getAccAngleX());
+    Serial.print("\taccAngleY : ");Serial.println(mpu6050.getAccAngleY());
+  
+    Serial.print("gyroAngleX : ");Serial.print(mpu6050.getGyroAngleX());
+    Serial.print("\tgyroAngleY : ");Serial.print(mpu6050.getGyroAngleY());
+    Serial.print("\tgyroAngleZ : ");Serial.println(mpu6050.getGyroAngleZ());
+    */
+    Serial.print("angleX : ");Serial.print(mpu6050.getAngleX());
+    Serial.print("\tangleY : ");Serial.print(mpu6050.getAngleY());
+    Serial.print("\tangleZ : ");Serial.println(mpu6050.getAngleZ());
+    //Serial.println("=======================================================\n");
+
+    delay(200);
   }
 }
