@@ -788,6 +788,10 @@ void appendDir(fs::FS &fs, const char * dirname, String filename, uint8_t levels
 
 修改自[教你做一个ESP32-SD卡服务器](https://www.bilibili.com/video/BV1r34117746)，添加了**在线查看**功能、不同用户**分区**功能、用户名密码**登录**功能。
 
+使用**AP**模式**直连ESP32**时文件下载速度**最高可达350KB/s**，稳定在**330 ~ 350KB/s**。
+
+使用**STA**模式将ESP-HMI**连接至路由器**时下载速度**最高327KB/s**，稳定在**200KB/s**（路由器旁）。**远离**路由器时**只有18KB/s**，因此**推荐使用AP模式**。
+
 ###### 文件保存路径：
 
 ```c
@@ -881,11 +885,13 @@ void setRotation(byte rotation);
 
 <center>修改后的CLK信号：80MHz</center>
 
+（4）本项目文件夹中`SD`文件夹内名为`NewUserDemo`的文件夹用途是**创建新用户时复制粘贴到`User`文件夹内**以`生成文件系统`用的。
+
 ------
 
 ## 搭建方法：
 
-到[SoTWild/ESP-HMI: 基于 ESP32-WROVER 的人机界面 (github.com)](https://github.com/SoTWild/ESP-HMI)这个页面选择`Code -> Download ZIP`下载压缩包。
+（1）到[SoTWild/ESP-HMI: 基于 ESP32-WROVER 的人机界面 (github.com)](https://github.com/SoTWild/ESP-HMI)这个页面选择`Code -> Download ZIP`下载压缩包。
 
 如果出现**404**错误，可以在**本地**一个文件夹**按 Shift 再右键**打开 **Power Shell 窗口**使用
 
@@ -903,11 +909,27 @@ git clone https://github.com/SoTWild/ESP-HMI.git
 >
 > PCB：**两版**设计，包括**原理图**、**PCB图**和**嘉立创EDA文件**
 >
+> SD：里面文件是**TF卡**内应装载的
+>
 > LICENCE：GNU 协议
 >
 > README.md：文档
 >
 > README-EN.md：英文文档（还没有添加）
+
+（2）下载Gerber文件，送板厂打样
+
+> 注：由于是4层PCB，若要黑色阻焊层，得加钱。
+
+（3）根据BOM表购买元件焊接
+
+（4）将SD文件夹中文件复制到准备好的TF卡内
+
+（5）上传程序，装配TF卡
+
+（6）调试
+
+（7）完成
 
 ------
 
