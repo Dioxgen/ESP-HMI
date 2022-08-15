@@ -26,6 +26,8 @@
 
 - #### [注意事项](#ESP-HMI 注意事项)
 
+- #### [搭建方法](#搭建方法)
+
 - #### [其他](#其他)
 
 	- ###### [特别感谢](#Special Thanks)
@@ -41,6 +43,8 @@ ESP-HMI 是 Link 设备链中的一个，是整个项目最**难**开发的部�
 我还开发了一些针对**不同人群**的功能：**文本阅读、编辑、图片查看、播放MJPEG视频、运行小程序**等。如果你是**开发者**，你也可以使用引出的I/O对它进行**二次开发**。（普通人可以把它看做一个功能**极其简单**的小电脑）
 
 为了高效率运行程序，我移植了 **FreeRTOS** 操作系统，使得主控芯片可以 “同时” 运行多个程序。
+
+本文档很长，见谅。
 
 #### 项目开发人员：
 
@@ -855,6 +859,39 @@ void appendDir(fs::FS &fs, const char * dirname, String filename, uint8_t levels
 （1）使用了两个TFT库（TFT_eSPI、Arduino GFX），分别负责**绘制GUI**和**播放Mjpeg视频**。
 
 原因：TFT_eSPI用得比较熟悉……<img src="https://i0.hdslb.com/bfs/emote/3087d273a78ccaff4bb1e9972e2ba2a7583c9f11.png" style="zoom:20%;" />
+
+（2）不同的触摸模块需要配置（校准、设置旋转方向）
+
+```c
+void setCal(uint16_t xmin, uint16_t xmax, uint16_t ymin, uint16_t ymax, uint16_t xres, uint16_t yres, boolean axis);
+void setRotation(byte rotation);
+```
+
+注：代码中`setRotation`有**多处**需要修改。
+
+------
+
+## 搭建方法：
+
+到[SoTWild/ESP-HMI: 基于 ESP32-WROVER 的人机界面 (github.com)](https://github.com/SoTWild/ESP-HMI)这个页面选择`Code -> Download ZIP`下载压缩包。
+
+如果出现**404**错误，可以在**本地**一个文件夹**按 Shift 再右键**打开 **Power Shell 窗口**使用
+
+```c
+git clone https://github.com/SoTWild/ESP-HMI.git
+```
+
+这个命令克隆存储库（前提是安装了git）。
+
+###### 压缩包文件：
+
+ESP32-HMI：右键“**通过 Code 打开**”可以修改**.ini**配置文件后直接加载**Platform IO**编译上传。或者将`include`和`src`文件夹**合并**，将`lib`文件夹中的库导入，使用 **Arduino IDE** 打开。
+
+Images：文档使用的**图片**
+
+PCB：**两版**设计，包括**原理图**、**PCB图**和**嘉立创EDA文件**
+
+LICENCE：GNU 协议
 
 ------
 
