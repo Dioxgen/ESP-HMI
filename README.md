@@ -40,7 +40,7 @@
 
 ESP-HMI 是 Link 设备链中的一个，是整个项目最**难**开发的部分，主要提供**远程直接开关设备、数据汇总（设备监控）**。
 
-我还开发了一些针对**不同人群**的功能：**文本阅读、编辑、图片查看、播放MJPEG视频、运行小程序**等。如果你是**开发者**，你也可以使用引出的I/O对它进行**二次开发**。（普通人可以把它看做一个功能**极其简单**的小电脑）
+我还开发了一些针对**不同人群**的功能：**文本阅读、编辑、图片查看、播放MJPEG视频、运行小程序**等。如果你是**开发者**，你也可以对它进行**二次开发**。（普通人可以把它看做一个功能**极其简单**的小电脑）
 
 为了高效率运行程序，我移植了 **FreeRTOS** 操作系统，使得主控芯片可以 “同时” 运行多个程序。
 
@@ -869,6 +869,18 @@ void setRotation(byte rotation);
 
 注：代码中`setRotation`有**多处**需要修改。
 
+（3）在TFT_eSPI库`/User_Setups/Setup21_ILI9488.h`中，设置了`SPI_FREQUENCY`为**40MHz**，80MHz会出现**花屏**现象。
+
+注：若将屏幕更换为**ST7796**驱动芯片的类型可能解决花屏问题（待测试）
+
+![](https://i2.imgu.cc/images/2022/08/15/CXNbO.jpg)
+
+<center>修改前的CLK信号：40MHz</center>
+
+![](https://i2.imgu.cc/images/2022/08/15/CXktS.jpg)
+
+<center>修改后的CLK信号：80MHz</center>
+
 ------
 
 ## 搭建方法：
@@ -885,13 +897,17 @@ git clone https://github.com/SoTWild/ESP-HMI.git
 
 ###### 压缩包文件：
 
-ESP32-HMI：右键“**通过 Code 打开**”可以修改**.ini**配置文件后直接加载**Platform IO**编译上传。或者将`include`和`src`文件夹**合并**，将`lib`文件夹中的库导入，使用 **Arduino IDE** 打开。
-
-Images：文档使用的**图片**
-
-PCB：**两版**设计，包括**原理图**、**PCB图**和**嘉立创EDA文件**
-
-LICENCE：GNU 协议
+> ESP32-HMI：右键“**通过 Code 打开**”可以修改**.ini**配置文件后直接加载**Platform IO**编译上传。或者将`include`和`src`文件夹**合并**，将`lib`文件夹中的库导入，使用 **Arduino IDE** 打开。
+>
+> Images：文档使用的**图片**
+>
+> PCB：**两版**设计，包括**原理图**、**PCB图**和**嘉立创EDA文件**
+>
+> LICENCE：GNU 协议
+>
+> README.md：文档
+>
+> README-EN.md：英文文档（还没有添加）
 
 ------
 

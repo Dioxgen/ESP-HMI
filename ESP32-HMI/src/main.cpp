@@ -43,7 +43,7 @@ void setup() {
   Serial.begin(115200);
   //WiFi.mode(WIFI_OFF);
 
-  gfx->begin(60000000);
+  gfx->begin(40000000);
 
   tft.init();
   tft.fillScreen(TFT_BLACK);
