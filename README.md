@@ -26,13 +26,17 @@
 
 - #### [注意事项](#ESP-HMI 注意事项)
 
+	- ###### [硬件](#- 硬件)
+
+	- ###### [软件](#- 软件)
+
 - #### [搭建方法](#搭建方法)
 
 - #### [其他](#其他)
 
-	- ###### [特别感谢](#Special Thanks)
+  - ###### [特别感谢](#Special Thanks)
 
-	- ###### [结语](#结语)
+  - ###### [结语](#结语)
 
 ------
 
@@ -88,153 +92,81 @@ Visual Studio Code，Platform IO
 
 ## Change Log：
 
-#### 2021.09.05：
+2021.09.05：开始构思
 
-开始构思
+2021.10.22：成功播放 Mjpeg 视频
 
-#### 2021.10.22：
+2021.10.23：在 Mjpeg 基础上，添加了 pcm 背景音乐
 
-成功播放 Mjpeg 视频
+2021.12.19：成功驱动 XPT2046 触摸芯片并运行了 LVGL demo
 
-#### 2021.10.23：
+2021.12.21：优化 Mjpeg 240*320 像素，帧率最高 8.9FPS
 
-在 Mjpeg 基础上，添加了 pcm 背景音乐
+2021.12.25：解码 jpg 文件；完成 ESP-IED Ver 1 PCB 的绘制
 
-#### 2021.12.19：
+2021.12.26：编写画图程序
 
-成功驱动 XPT2046 触摸芯片并运行了 LVGL demo
+2021.12.30：编写 MP3 程序
 
-#### 2021.12.21：
+2022.01.01：ESP-HMI Ver 1 直插板成功搭建
 
-优化 Mjpeg 240*320 像素，帧率最高 8.9FPS
+2022.01.02：开始编辑源代码
 
-#### 2021.12.25：
+2022.01.02：添加 Media Player 中 Mjpeg 播放功能
 
-解码 jpg 文件；完成 ESP-IED Ver 1 PCB 的绘制
+2022.01.03：添加 Media Player 中 Jpeg  播放功能|添加 Media Player 中 MP3  播放功能
 
-#### 2021.12.26：
+2022.01.09：添加 Media Player 中 PCM  播放功能
 
-编写画图程序
+2022.01.09：添加 Media Player 中 TXT  播放功能
 
-#### 2021.12.30：
+2022.01.12：添加 Draw 功能
 
-编写 MP3 程序
+2022.01.12：添加 THMini 功能
 
-#### 2022.01.01：
+2022.03.28：添加 Album 功能
 
-ESP-HMI Ver 1 直插板成功搭建
+2022.03.28：添加 Ebook 功能
 
-#### 2022.01.02：
+2022.03.29 ：代码优化
 
-开始编辑源代码
+2022.04.01：蓝牙音频传输（接收）
 
-#### 2022.01.02：
+2022.04.05：开始编写 Sounder
 
-添加 Media Player 中 Mjpeg 播放功能
+2022.04.10：完成编写 Sounder
 
-#### 2022.01.03：
+2022.04.13：开始编写 Vision
 
-添加 Media Player 中 Jpeg  播放功能；添加 Media Player 中 MP3  播放功能
+2022.04.14：完成编写 Vision
 
-#### 2022.01.09：
+2022.04.17：完善 Ebook
 
-添加 Media Player 中 PCM  播放功能
+2022.04.18：开始并完成编写 Settings
 
-#### 2022.01.09：
+2022.04.22：绘制 Ver 1 原理图
 
-添加 Media Player 中 TXT  播放功能
+2022.05.02：用户登陆系统
 
-#### 2022.01.12：
+2022.07.05：计算器（普通）
 
-添加 Draw 功能
+2022.07.08：温度计
 
-#### 2022.01.12：
+2022.07.12：文件上传
 
-添加 THMini 功能
+2022.07.14：WiFi
 
-#### 2022.03.28：
+2022.07.30：Ver 1 PCB完成
 
-添加 Album 功能
+2022.08.12：Ver 1 PCB调试完成
 
-#### 2022.03.28：
+2022.08.13：添加Task Manager
 
-添加 Ebook 功能
+2022.08.14：完成Album功能；编写文档
 
-#### 2022.03.29 ：
+2022.08.15：编写文档
 
-代码大改
-
-#### 2022.04.01：
-
-蓝牙音频传输（接收）
-
-#### 2022.04.05：
-
-开始编写 Sounder
-
-#### 2022.04.10：
-
-完成编写 Sounder
-
-#### 2022.04.13：
-
-开始编写 Vision
-
-#### 2022.04.14：
-
-完成编写 Vision
-
-#### 2022.04.17：
-
-完善 Ebook
-
-#### 2022.04.18：
-
-开始并完成编写 Settings
-
-#### 2022.04.22：
-
-绘制 Ver 1 原理图
-
-#### 2022.05.02：
-
-用户登陆系统
-
-#### 2022.07.05：
-
-计算器（普通）
-
-#### 2022.07.08：
-
-温度计
-
-#### 2022.07.12：
-
-文件上传
-
-#### 2022.07.14：
-
-WiFi
-
-#### 2022.07.30：
-
-Ver 1 PCB完成
-
-#### 2022.08.12：
-
-Ver 1 PCB调试完成
-
-#### 2022.08.13：
-
-添加Task Manager
-
-#### 2022.08.14：
-
-完成Album功能；编写文档
-
-#### 2022.08.15：
-
-编写文档
+2022.08.16： 修改Task Manager|Debug Vision
 
 ------
 
@@ -258,7 +190,7 @@ Ver 1 PCB调试完成
 >
 > 触摸芯片：XPT2046
 
-<img src="https://tse1-mm.cn.bing.net/th/id/R-C.c19b0647f33463543697b2392da7909e?rik=XlUPUTWrrgJY4w&riu=http%3a%2f%2fspotpear.cn%2fuploads%2fpicture%2fproduct%2farduino%2farduino-expansion%2f3.5inch-tft-touch-shield%2f3.5inch-tft-touch-shield-02.jpg&ehk=owJ7ZBHyZSnNiZ5OAvgHWOqoyD5GxQSpUkddMqO3YaE%3d&risl=&pid=ImgRaw&r=0" style="zoom:35%;" />
+<img src="https://i2.imgu.cc/images/2022/08/15/CXwkV.jpg" style="zoom:35%;" />
 
 <center>屏幕模块</center>
 
@@ -266,7 +198,7 @@ Ver 1 PCB调试完成
 
 最大 **32G**，推荐 4 或 8G。
 
-<img src="https://tse1-mm.cn.bing.net/th/id/R-C.d46a9a0f22c0a49e08a9399979d838b5?rik=89LjVtYCdusYQA&riu=http%3a%2f%2fimg.11665.com%2fimg02_p%2fi2%2f10739028636189440%2fT1DGqAFotXXXXXXXXX_!!0-item_pic.jpg&ehk=Y%2fUCSCyDxTxxWsFynax8Yrqs4gzPDIwAu3rvuZC%2fPV8%3d&risl=&pid=ImgRaw&r=0" style="zoom:10%;" />
+<img src="https://i2.imgu.cc/images/2022/08/15/CX4sh.jpg" style="zoom:15%;" />
 
 <center>32G TF卡</center>
 
@@ -715,7 +647,9 @@ void appendDir(fs::FS &fs, const char * dirname, String filename, uint8_t levels
 
 和Sounder的实现方法**大同小异**，添加了显示封面图片的功能。
 
-###### **必须要3个**文件，分别是封面、mjpeg、pcm。
+###### 必须要3个文件，分别是封面、mjpeg、pcm。
+
+原因：系统读取`VideoCover`文件夹内文件，根据**封面**文件名**截取字符串**得出**文件名**，后**添加后缀**得出**其余文件名**。
 
 注：封面大小需 **≤ 180 x 100**。
 
@@ -723,6 +657,20 @@ void appendDir(fs::FS &fs, const char * dirname, String filename, uint8_t levels
 .jpg的路径：/User/登录的用户名/Data/Video/VideoCover/xxx.jpg
 .mjpeg的路径：/User/登录的用户名/Data/Video/VideoData/xxx.mjpeg
 .pcm的路径：/User/登录的用户名/Data/Video/VideoData/xxx.pcm
+```
+
+**.mp4转.mjpeg**的方法：下载**ffmpeg**，[Play Video With ESP32](https://www.instructables.com/Play-Video-With-ESP32/)，使用指令：
+
+```c
+ffmpeg -i input.mp4 -vf "fps=30" output.mjpeg
+```
+
+注：可以用ffmpeg调整视频序列设置或者提前准备合适的视频。
+
+这是**.mp4转.pcm**：
+
+```c
+ffmpeg -i input.mp4 -f u16be -acodec pcm_u16le -ar 44100 -ac 1 output.pcm
 ```
 
 #### 画图：
@@ -824,7 +772,7 @@ void appendDir(fs::FS &fs, const char * dirname, String filename, uint8_t levels
 
 ## ESP-HMI 注意事项：
 
-### 硬件：
+### - 硬件：
 
 （1）PCB上要将**IO25与XPT2046的T_CLK断开**，**将T_CLK和IO0连接**。
 
@@ -858,7 +806,7 @@ void appendDir(fs::FS &fs, const char * dirname, String filename, uint8_t levels
 
 ------
 
-### 软件：
+### - 软件：
 
 （1）使用了两个TFT库（TFT_eSPI、Arduino GFX），分别负责**绘制GUI**和**播放Mjpeg视频**。
 
@@ -886,6 +834,32 @@ void setRotation(byte rotation);
 <center>修改后的CLK信号：80MHz</center>
 
 （4）本项目文件夹中`SD`文件夹内名为`NewUserDemo`的文件夹用途是**创建新用户时复制粘贴到`User`文件夹内**以`生成文件系统`用的。
+
+（5）**电池电压和百分比**的计算方法比较粗糙，百分比算法是：
+$$
+\frac{采样值-关机电压}{满电电压-关机电压}\times100\%
+$$
+这里设置关机电压为$$3.5V$$。则代码算法是：
+$$
+BatteryLevel=\frac{GetBatteryVol()-3.5}{0.7(4.2V-3.5V)}\times100\%
+$$
+如果要遵循电池放电曲线，提高精度，需要使用**积分**计算。
+
+计算**剩余使用时间**的方法是：
+$$
+\frac{电池百分比\times电池容量}{系统耗电电流}(小时)
+$$
+如果要计算到分钟，只要再 $$×60$$ 即可。
+
+代码算法是：
+$$
+GetBatteryRemainingTime=\frac{GetBatteryLevel()\times4000}{150}
+$$
+这里设置电池容量为$$4000mAh$$，耗电电流为$$150mA$$。
+
+（6）烧录完成后ESP32**无限重启**：**重新烧录**。
+
+原因：未知。
 
 ------
 

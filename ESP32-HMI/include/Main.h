@@ -198,7 +198,7 @@ void Refresh() {
   appendDir(SD_MMC, Userdir.c_str() , filedir, 2);
   
   Userdir = String("/User/") + User + String("/Config/VideoConfig.txt");
-  filedir = String("/User/") + User + String("/Data/Video/VideoData");
+  filedir = String("/User/") + User + String("/Data/Video/VideoCover");
   SD_MMC.remove(Userdir.c_str());
   appendDir(SD_MMC, Userdir.c_str() , filedir, 3);
 
@@ -720,7 +720,6 @@ void Music(){
 
 //Vision:
 void VideoCheck(int videonum){
-
   int strlen;
   String filename;
   String Vfile;
@@ -729,10 +728,10 @@ void VideoCheck(int videonum){
   tft.fillScreen(TFT_BLACK);
   IfVision = 1;
   strlen = sizeof(User);
-  strlen = strlen + 23;
+  strlen = strlen + 24;
   filedir = String ("/User/") + User + String("/Config/VideoConfig.txt");
-  filename = readFileLine(filedir.c_str(), videonum * 2 - 1).substring(strlen);
-  filename = filename.substring(0,filename.length() - 6 );//.mjpeg
+  filename = readFileLine(filedir.c_str(), videonum).substring(strlen);
+  filename = filename.substring(0,filename.length() - 4 );//.jpg
   VideoName = filename;
 
   Vfile = String("/User/") + User +String("/Data/Video/VideoData/") + VideoName + String(".mjpeg");
@@ -760,8 +759,8 @@ void listVideo(int VideoPage){
   tft.setTextColor(TFT_DARKGREEN);
   tft.setCursor(0, 0);
 
-  VideoBline = (VideoPage - 1) * 8 + 1;
-  VideoEline = VideoBline + 7;
+  VideoBline = (VideoPage - 1) * 4 + 1;
+  VideoEline = VideoBline + 3;
 
   strlen = strlen + 35;
   Serial.printf("strlen: %d\n",strlen);
@@ -769,16 +768,20 @@ void listVideo(int VideoPage){
   Serial.println(VideoBline);
   Serial.println(VideoEline);
 
-  while (VideoBline < VideoEline) {
+  while (VideoBline <= VideoEline) {
     strlen = sizeof(User);
-    strlen = strlen + 23;
+    strlen = strlen + 24;
     filedir = String ("/User/") + User + String("/Config/VideoConfig.txt");
     filename = readFileLine(filedir.c_str(), VideoBline).substring(strlen);
-    filename = filename.substring(0,filename.length() - 6 );//.mjpeg
+    Serial.print("1 Video name: ");
+    Serial.println(filename);
+    filename = filename.substring(0,filename.length() - 4 );//.jpg
     VideoName = filename;
-    //Serial.println(VideoName);
+    Serial.print("2 Video name: ");
+    Serial.println(VideoName);
     VideoCover = String("/User/") + User +String("/Data/Video/VideoCover/") + VideoName + String(".jpg");//封面路径
     //tft.println(VideoCover);
+
     if(a == 1) {
       drawSdJpeg(VideoCover.c_str(),40,20);
       //tft.setCursor(40,130);
@@ -800,7 +803,7 @@ void listVideo(int VideoPage){
       //tft.print(VideoName);
     }
     //Serial.println(a);
-    VideoBline = VideoBline + 2;
+    VideoBline++;
     a++;
   }
 }
@@ -913,7 +916,7 @@ void listEbook(int BookPage){
   Serial.println(BookBline);
   Serial.println(BookEline);
 
-  while (BookBline < BookEline) {
+  while (BookBline <= BookEline) {
     strlen = sizeof(User);
     strlen = strlen + 23;
     filedir = String ("/User/") + User + String("/Config/EbookConfig.txt");
@@ -1776,6 +1779,7 @@ void Task_Manager(){
       tft.print(ESP.getCpuFreqMHz());
       tft.print(" MHz");
       tft.setCursor(65,80);
+      tft.fillRect(175,80,150,20,TFT_WHITE);
       tft.printf("Run time: %ld Minutes", millis() / 60000);
     }
     else if(ViewTask == 2) {
@@ -1789,15 +1793,19 @@ void Task_Manager(){
         Drawed6 = 0;
       }
       tft.setCursor(65,50);
+      tft.fillRect(320,50,85,20,TFT_WHITE);
       tft.printf("Internal RAM total size: %u KB", ESP.getHeapSize() / 1024);
 
       tft.setCursor(65,80);
+      tft.fillRect(295,80,80,20,TFT_WHITE);
       tft.printf("Available heap size: %u KB", ESP.getFreeHeap() / 1024);
 
       tft.setCursor(65,110);
+      tft.fillRect(167,110,100,20,TFT_WHITE);
       tft.printf("SPI RAM: %u KB", ESP.getPsramSize() / 1024);
       
       tft.setCursor(65,140);
+      tft.fillRect(240,140,100,20,TFT_WHITE);
       tft.printf("Available heap: %u KB", ESP.getFreePsram() / 1024);
       /*
       IRAM_Usage = printf("%ld",(long)ESP.getHeapSize()) - printf("%ld",(long)ESP.getFreeHeap());
@@ -1854,19 +1862,22 @@ void Task_Manager(){
         Drawed6 = 0;
       }
       tft.setCursor(65,50);
+      tft.fillRect(245,50,80,20,TFT_WHITE);
       tft.print("Battery Voltage: ");
-      tft.setTextColor(TFT_WHITE);
-      tft.print(BatteryVol);
-      tft.setTextColor(TFT_BLACK);
+      tft.print(GetBatteryVol());
       tft.print(" V");
-      ADC_VALUE = analogRead(34);
-      //Serial.println(BatteryVol);
-      BatteryVol = (ADC_VALUE * 3.3 * 2 ) / (4095);
-      //Serial.println(BatteryVol);
-      tft.setCursor(65,50);
-      tft.print("Battery Voltage: ");
-      tft.print(BatteryVol);
-      tft.print(" V");
+
+      tft.setCursor(65,80);
+      tft.fillRect(220,80,100,20,TFT_WHITE);
+      tft.print("Battery Level: ");
+      tft.print(GetBatteryLevel() * 100);
+      tft.print(" %");
+
+      tft.setCursor(65,110);
+      tft.fillRect(345,110,95,20,TFT_WHITE);
+      tft.print("Battery Remaining Time: ");
+      tft.print(GetBatteryRemainingTime());
+      tft.print(" h");
     }
     else if(ViewTask == 5) {
       if(Drawed5 == 0) {

@@ -25,6 +25,7 @@
   2022/07/14 WiFi
   2022/08/13 添加Task Manager
   2022/08/14 完成Album功能
+  2022/08/16 修改Task Manager|Debug Vision
 */
 
 //无线AP名称Teacher WiFi

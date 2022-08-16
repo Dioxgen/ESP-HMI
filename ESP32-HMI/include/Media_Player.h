@@ -59,8 +59,6 @@ float CalResult = 0;
 float IRAM_Usage = 0;
 float SRAM_Usage = 0;
 float ROM_Usage = 0;
-float ADC_VALUE = 0;
-float BatteryVol = 0;
 
 bool notice;
 bool TFT_bl_state = 1;
@@ -207,6 +205,7 @@ void Mjpeg_start(const char *MJPEG_FILENAME, const char *AUDIO_FILENAME) {
             aFile.close();
             // avoid unexpected output at audio pins
             i2s_driver_uninstall((i2s_port_t)0); //stop & destroy i2s driver
+            heap_caps_free(NULL);//free RAM
             gfx->fillScreen(TFT_BLACK);
             int played_frames = next_frame - 1 - skipped_frames;
             float fps = 1000.0 * played_frames / time_used;
@@ -269,6 +268,9 @@ void Mjpeg_start(const char *MJPEG_FILENAME, const char *AUDIO_FILENAME) {
             total_play_video = 0;
             total_remain = 0;
             total_show_video = 0;
+            start_ms = 0;
+            curr_ms = 0;
+            next_frame_ms = 0;
             EnableVC = 1;
             delay(1500);
             gfx->fillScreen(TFT_BLACK);
@@ -297,6 +299,8 @@ void SD_read_Time(uint32_t msTime);
 void drawSdJpeg(const char *filename, int xpos, int ypos) {
   uint32_t readTime = millis();
   File jpegFile = SD_MMC.open(filename, FILE_READ);
+  Serial.print("FileName: ");
+  Serial.println(filename);
 
   if ( !jpegFile ) {
     Serial.print("ERROR: File \"");
@@ -1271,4 +1275,15 @@ void MPU_Setup(){
 
     delay(200);
   }
+}
+
+//Battery
+float GetBatteryVol() {
+  return (analogRead(34) * 3.3 * 2 ) / 4095;
+}
+float GetBatteryLevel() {
+  return (GetBatteryVol() - 3.5) / (4.2 - 3.5);
+}
+float GetBatteryRemainingTime() {
+  return (GetBatteryLevel() * 4000) / 150;
 }
