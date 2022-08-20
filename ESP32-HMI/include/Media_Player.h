@@ -14,6 +14,7 @@ String BookName;
 String str_CalNum1;
 String str_CalNum2;
 String ImageName;
+String GameName;
 
 int Mainpage = 1;
 int MS_num;
@@ -52,6 +53,11 @@ int Image_num = 1;
 int ImageBline;
 int ImageEline;
 int EnableIC = 0;
+int GamePage = 1;
+int GameBline;
+int GameEline;
+int EnableGC = 0;
+int Volume_bar = 398;
 
 float CalNum1 = 0;
 float CalNum2 = 0;
@@ -59,6 +65,7 @@ float CalResult = 0;
 float IRAM_Usage = 0;
 float SRAM_Usage = 0;
 float ROM_Usage = 0;
+float Volume = 1;//Volume_bar = 397.5|Volume_cir = 377.5
 
 bool notice;
 bool TFT_bl_state = 1;
@@ -414,21 +421,20 @@ int state = 0;
 
 void THMini() {
   tft.setRotation(0);
-  touch.setRotation(2);
+  touch.setRotation(0);
   tft.setTextSize(1);
-  tft.setTextColor(TFT_MAGENTA);
-  tft.setCursor(0, 0);
   tft.setTextDatum(MC_DATUM);
+  state = 0;
   while (1) {
     if (state == 0) {
       tft.setCursor(5, 5);
       tft.setTextColor(TFT_BLUE);
-      Userdir = String ("/User/") + User + String("/Data/Game/TouHou/Mini/image/start.jpg");
+      Userdir = String ("/User/") + User + String("/Data/Game/GameData/TouHou/Mini/image/start.jpg");
       drawSdJpeg(Userdir.c_str(), 0, 0);
       state = 1;
     }
-    if (touch.Pressed()) {
-      Userdir = String ("/User/") + User + String("/Data/Game/TouHou/Mini/image/background.jpg");
+    if (touch.Pressed() && touch.Y() > 320) {
+      Userdir = String ("/User/") + User + String("/Data/Game/GameData/TouHou/Mini/image/background.jpg");
       drawSdJpeg(Userdir.c_str(), 0, 0);
       tft.print("score:");
       tft.setCursor(5, 25);
@@ -436,7 +442,7 @@ void THMini() {
       while (1) {
         if (touch.Pressed()) {
           //tft.fillRect(127,y - spd,64,64,TFT_WHITE);
-          Userdir = String ("/User/") + User + String("/Data/Game/TouHou/Mini/image/background.jpg");
+          Userdir = String ("/User/") + User + String("/Data/Game/GameData/TouHou/Mini/image/background.jpg");
           drawSdJpeg(Userdir.c_str(), 0, 0);
           tft.fillRect(40, 0, 280, 30, TFT_WHITE);
           if (y < 100) {
@@ -459,11 +465,11 @@ void THMini() {
         else {
           tft.fillRect(127, y - spd, 64, 64, TFT_WHITE);
           if (obj == 1) {
-            Userdir = String ("/User/") + User + String("/Data/Game/TouHou/Mini/image/object1.jpg");
+            Userdir = String ("/User/") + User + String("/Data/Game/GameData/TouHou/Mini/image/object1.jpg");
             drawSdJpeg(Userdir.c_str(), 127, y);
           }
           else if (obj == 2) {
-            Userdir = String ("/User/") + User + String("/Data/Game/TouHou/Mini/image/object2.jpg");
+            Userdir = String ("/User/") + User + String("/Data/Game/GameData/TouHou/Mini/image/object2.jpg");
             drawSdJpeg(Userdir.c_str(), 127, y);
           }
           y = y + spd;
@@ -481,6 +487,12 @@ void THMini() {
           }
         }
       }
+    }
+    else if(touch.Pressed()){
+      tft.setRotation(1);
+      touch.setRotation(1);
+      EnableGC = 1;
+      break;
     }
     else {
       delay(30);
@@ -821,7 +833,7 @@ void GetfromMometer(){
 
 #define NTP_OFFSET  28800
 #define NTP_INTERVAL 1 * 1000
-#define NTP_ADDRESS  "ntp.ntsc.ac.cn"
+#define NTP_ADDRESS "210.72.145.39"//"ntp.ntsc.ac.cn"
 
 const char *ssid = "ESP-HMI";
 const char *psword = "123456789";
@@ -835,16 +847,6 @@ WiFiUDP ntpUDP;
 NTPClient timeClient(ntpUDP, NTP_ADDRESS, NTP_OFFSET, NTP_INTERVAL);
 WiFiMulti wifiMulti;
 
-void getNetTime(){
-  timeClient.begin();
-  timeClient.update();
-  unsigned long epochTime = timeClient.getEpochTime();
-  struct tm *ptm = gmtime ((time_t *)&epochTime);
-  int monthDay = ptm->tm_mday;
-  int tm_Month = ptm->tm_mon + 1;
-  int tm_Year = ptm->tm_year + 1900;
-  timeClient.getFormattedTime();
-}
 void WiFiInit(String Mode){
   tft.setCursor(0,0);
   tft.setTextColor(TFT_WHITE);
@@ -1194,17 +1196,17 @@ void DS1307(){
 // rtc.begin(sdapin, sclpin);                     
   rtc.DSadjust(0, 12, 10, 2022, 8, 13);
 // rtc.DSadjust(1647216003); // 00:00:03 14 Mar 2022
-// rtc.SetFont(0);                         //  language 0 = EN  |  1 = FR  |  2 = GR 
+  rtc.SetFont(0);                         //  language 0 = EN  |  1 = FR  |  2 = GR 
   while(1){
     rtc.DSread(); 
-      Serial.println(rtc.getMahmin(true));      //  (String) true = 00:00  false = 00 00  (24h)
-      Serial.println(rtc.getMihmin(true));      //  (String) true = 12:00  false = 12 00  (12h)
-      Serial.println(rtc.getTime());          //  (String) 00:00:03  (24h)
-      Serial.println(rtc.getTime(true));      //  (String) 12:00:03  (12h)
-      Serial.println(rtc.getDate());          //  (String) Mon, 14 Mar 2022
-      Serial.println(rtc.getDate(true));      //  (String) Monday, 14-March-2022
+      //Serial.println(rtc.getMahmin(true));      //  (String) true = 00:00  false = 00 00  (24h)
+      //Serial.println(rtc.getMihmin(true));      //  (String) true = 12:00  false = 12 00  (12h)
+      //Serial.println(rtc.getTime());          //  (String) 00:00:03  (24h)
+      //Serial.println(rtc.getTime(true));      //  (String) 12:00:03  (12h)
+      //Serial.println(rtc.getDate());          //  (String) Mon, 14 Mar 2022
+      //Serial.println(rtc.getDate(true));      //  (String) Monday, 14-March-2022
       Serial.println(rtc.getDateTime());      //  (String) Mon, 14 Mar 2022 00:09:21
-      Serial.println(rtc.getDateTime(true));  //  (String) Monday, 14-March-2022 00:09:21
+      /*Serial.println(rtc.getDateTime(true));  //  (String) Monday, 14-March-2022 00:09:21
       Serial.println(rtc.getTimeDate());      //  (String) 12:07:18 Mon, 14 Mar 2022
       Serial.println(rtc.getTimeDate(true));  //  (String) 00:00:03 Monday, 14-March-2022
       Serial.println(rtc.getDayDate());       //  (String) 2022-03-14
@@ -1231,7 +1233,7 @@ void DS1307(){
       Serial.println(rtc.year + 2000);        //  (int)     2022
       Serial.println(rtc.dayOfWeek);          //  (int)     1     (0-6)
       Serial.println(rtc.DayofYear);          //  (int)     73    (0-365)
-      Serial.println(""); 
+      Serial.println(""); */
       delay(1000);
   }
 }
@@ -1242,12 +1244,12 @@ void DS1307(){
 
 MPU6050 mpu6050(Wire);
 
-void MPU_Setup(){
+void MPU_Setup(int enable){
   Wire.begin();
   mpu6050.begin();
   mpu6050.calcGyroOffsets(true);
 
-  while(1){
+  while(enable){
     mpu6050.update();
     
     //Serial.println("=======================================================");
@@ -1276,6 +1278,9 @@ void MPU_Setup(){
     delay(200);
   }
 }
+String MPU_State() {
+
+}
 
 //Battery
 float GetBatteryVol() {
@@ -1286,4 +1291,36 @@ float GetBatteryLevel() {
 }
 float GetBatteryRemainingTime() {
   return (GetBatteryLevel() * 4000) / 150;
+}
+
+//Clock
+unsigned long epochTime = timeClient.getEpochTime();
+String formattedTime = timeClient.getFormattedTime();
+
+struct tm *ptm = gmtime ((time_t *)&epochTime);
+
+//int tm_Hour = timeClient.getHours();
+//int tm_Minute = timeClient.getMinutes();
+//int tm_Second = timeClient.getSeconds();
+int weekDay = timeClient.getDay();
+int monthDay = ptm->tm_mday;
+int tm_Month = ptm->tm_mon+1;
+int tm_Year = ptm->tm_year+1900;
+int Clock_Mode = 1;//0-Alarm;1-Clock;2-Stopwatch
+
+uint32_t targetTime = 0;                    // for next 1 second timeout
+
+static uint8_t conv2d(const char* p); // Forward declaration needed for IDE 1.6.x
+
+uint8_t hh, mm, ss; // Get H, M, S from compile time
+
+byte omm = 99, oss = 99;
+byte xcolon = 0, xsecs = 0;
+unsigned int colour = 0;
+
+static uint8_t conv2d(const char* p) {
+  uint8_t v = 0;
+  if ('0' <= *p && *p <= '9')
+    v = *p - '0';
+  return 10 * v + *++p - '0';
 }

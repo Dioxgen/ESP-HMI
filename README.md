@@ -166,7 +166,9 @@ Visual Studio Code，Platform IO
 
 2022.08.15：编写文档
 
-2022.08.16： 修改Task Manager|Debug Vision
+2022.08.16：修改Task Manager|Debug Vision
+
+2022.08.19：完善Album
 
 ------
 

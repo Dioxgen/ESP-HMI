@@ -388,27 +388,102 @@ void Album() {
   }
 }
 
-void Game() {
-  tft.setTextSize(3);
-  tft.setCursor(0, 0, 0);
-  tft.print("THMini");
-  tft.setCursor(0, 30);
-  tft.print("Draw");
+//Game
+void PlayGame(String name){
+  Serial.print("playgame: ");
+  Serial.println(name);
+  if(name == "THMini") {
+    THMini();
+  }
+}
+void GameCheck(int gamenum){
+  tft.fillScreen(TFT_BLACK);
+  delay(100);
+  filedir = String ("/User/") + User + String("/Config/GameConfig.txt");
+  PlayGame(readFileLine(filedir.c_str(), gamenum));
+}
+void listGame(int GamePage){
+  Serial.println(GamePage);
 
-  while (1) {
+  int strlen = 0;
+  int a = 1;
+  
+  String filename;
+  String GameCover;
+  
+  tft.fillScreen(tft.color565(214, 214, 214));
+  tft.fillRoundRect(10,270, 460, 40, 8, TFT_BLUE);
+  tft.setCursor(25, 280);
+  tft.setTextColor(TFT_ORANGE);
+  tft.print("Previous");
+  tft.print("                  ");
+  tft.print("Settings");
+  tft.print("                     ");
+  tft.print("Next");
+  tft.setTextColor(TFT_WHITE);
+  tft.setCursor(0, 0);
+
+  GameBline = (GamePage * 2) - 1;
+  GameEline = GamePage + 1;
+
+  strlen = strlen + 35;
+  Serial.printf("strlen: %d\n",strlen);
+
+  Serial.println(GameBline);
+  Serial.println(GameEline);
+
+  while (GameBline <= GameEline) {
+    strlen = sizeof(User);
+    strlen = strlen + 23;
+    filedir = String ("/User/") + User + String("/Config/GameConfig.txt");
+    GameName = readFileLine(filedir.c_str(), GameBline);
+    Serial.printf("GameName: %s\n", GameName.c_str());
+    GameCover = String("/User/") + User +String("/Data/Game/GameCover/") + GameName + String(".jpg");//封面路径
+    if(a == 1) {
+      drawSdJpeg(GameCover.c_str(),40,40);
+    }
+    else if(a == 2) {
+      drawSdJpeg(GameCover.c_str(),260,40);
+    }
+    //Serial.println(a);
+    GameBline++;
+    a++;
+  }
+}
+void Game() {
+  filedir = String ("/User/") + User + String("/Config/GameConfig.txt");
+  listGame(GamePage);
+
+  while(1){
+    if(GamePage < 1){
+      GamePage = 1;
+      listGame(GamePage);
+    }
     if (touch.Pressed()) {
-      X_Coord = touch.X();
-      Y_Coord = touch.Y();
-      if (X_Coord > 400) {
-        tft.fillScreen(TFT_BLACK);
+      if ((220 < touch.X()) && (touch.X() < 260) && (280 < touch.Y()) && (touch.Y() < 320)) {
+        //GameSet();
+      }
+      else if ((460 < touch.X()) && (touch.X() < 480) && (0 < touch.Y()) && (touch.Y() < 20)) {
         break;
       }
-      if     ((0 < X_Coord) && (X_Coord < 50) && (0 < Y_Coord) && (Y_Coord < 30)) {
-        THMini();
+      else if ((20 < touch.X()) && (touch.X() < 200) && (280 < touch.Y()) && (touch.Y() < 320)) {
+        GamePage--;
+        listGame(GamePage);
       }
-      else if ((0 < X_Coord) && (X_Coord < 50) && (30 < Y_Coord) && (Y_Coord < 60)) {
-        draw();
+      else if ((280 < touch.X()) && (touch.X() < 480) && (280 < touch.Y()) && (touch.Y() < 320)) {
+        GamePage++;
+        listGame(GamePage);
       }
+      else if ((40 < touch.X()) && (touch.X() < 180) && (40 < touch.Y()) && (touch.Y() < 240)){
+        GameCheck((GamePage * 2) - 1);
+      }
+      else if ((260 < touch.X()) && (touch.X() < 400) && (40 < touch.Y()) && (touch.Y() < 240)){
+        GameCheck(GamePage * 2);
+      }
+    }
+    if (EnableGC == 1){
+      EnableGC = 0;
+      listGame(GamePage);
     }
   }
 }
@@ -576,6 +651,10 @@ void MusicSet(){
   tft.fillRoundRect(350,0, 140, 320, 8, tft.color565(230, 230, 230));
   drawSdJpeg("/System/APP/Sounder/List Loop.jpg", 360, 10);
   drawSdJpeg("/System/APP/Sounder/Ble.jpg", 360, 130);
+  //tft.fillRoundRect(360,270,110,20,10,TFT_WHITE);
+  //tft.fillRoundRect(360,270,Volume_bar - 350,20,10,TFT_BLUE);
+  //tft.fillCircle(Volume_bar,270,15,TFT_DARKGREY);
+  //out = new AudioOutputI2S(0, 1, 128);
 
   MS_num = 0;
 
@@ -614,6 +693,24 @@ void MusicSet(){
         MusicPage = -1;
         break;
       }
+      /*else if ((340 < touch.X()) && (touch.X() < 480) && (250 < touch.Y()) && (touch.Y() < 320)) {
+        Volume = touch.X() - 370;
+        Volume = Volume / 110;
+        Volume = Volume * 4;
+
+        Volume_bar = Volume / 4;
+        Volume_bar = Volume_bar * 110;
+        Volume_bar = Volume_bar +350;
+
+        Serial.println(Volume);
+        //Serial.printf("b=%.1f\n",Volume);
+        Serial.println(Volume_bar);
+        tft.fillRect(360,265,110,30,tft.color565(230, 230, 230));
+        tft.fillRoundRect(360,270,110,20,10,TFT_WHITE);
+        tft.fillRoundRect(360,270,Volume_bar,20,10,TFT_BLUE);
+        tft.fillCircle(Volume_bar,280,15,TFT_DARKGREY);
+        out->SetGain(printf("b=%.1f\n",Volume));
+      }*/
       else {
         MusicPage = -1;
         break;
@@ -1967,6 +2064,168 @@ void Task_Manager(){
   }
 }
 
+//Clock
+void Clock() {
+  tft.fillScreen(TFT_BLACK);
+  tft.fillRect(0,30,480,5,TFT_BLUE);
+  tft.setCursor(0, 0);
+  tft.setTextColor(TFT_WHITE);
+  tft.print("Alarm");
+  tft.print("                          ");
+  tft.print("Clock");
+  tft.print("                    ");
+  tft.print("Stopwatch");
+  tft.fillRect(230,30,20,5,TFT_GREEN);
+
+  targetTime = millis() + 1000;
+  while(1) {
+    if(Clock_Mode == 0) {
+
+    }
+    else if(Clock_Mode == 1) {
+      
+      timeClient.update();
+      epochTime = timeClient.getEpochTime();
+      Serial.println(formattedTime);
+      //tm_Hour = timeClient.getHours();
+      //tm_Minute = timeClient.getMinutes();
+      //tm_Second = timeClient.getSeconds();
+      weekDay = timeClient.getDay();
+      tm *ptm = gmtime ((time_t *)&epochTime);
+      monthDay = ptm->tm_mday;
+      tm_Month = ptm->tm_mon+1;
+      tm_Year = ptm->tm_year+1900;
+      /*
+      tft.setTextSize(1);
+      tft.setTextFont(8);
+      tft.setCursor(40,85);
+      tft.setTextColor(TFT_BLACK);
+      tft.print(formattedTime);
+      formattedTime = timeClient.getFormattedTime();
+      tft.setCursor(40,85);
+      tft.setTextColor(TFT_WHITE);
+      tft.print(formattedTime);
+      
+      tft.drawNumber(timeClient.getHours(),40,85,8);
+      tft.drawChar(':',70,40,8);
+      tft.drawNumber(timeClient.getMinutes(),120,85,8);
+      tft.drawChar(':',150,40,8);
+      tft.drawNumber(timeClient.getSeconds(),200,85,8);
+      tft.drawChar(':',230,40,8);
+      */
+
+      if (targetTime < millis()) {
+    // Set next update for 1 second later
+    targetTime = millis() + 1000;
+
+    hh = conv2d(formattedTime.c_str()), mm = conv2d(formattedTime.c_str() + 3), ss = conv2d(formattedTime.c_str() + 6);
+
+    // Adjust the time values by adding 1 second
+    ss++;              // Advance second
+    if (ss == 60) {    // Check for roll-over
+      ss = 0;          // Reset seconds to zero
+      omm = mm;        // Save last minute time for display update
+      mm++;            // Advance minute
+      if (mm > 59) {   // Check for roll-over
+        mm = 0;
+        hh++;          // Advance hour
+        if (hh > 23) { // Check for 24hr roll-over (could roll-over on 13)
+          hh = 0;      // 0 for 24 hour clock, set to 1 for 12 hour clock
+        }
+      }
+    }
+
+
+    // Update digital time
+    int xpos = 0;
+    int ypos = 85; // Top left corner ot clock text, about half way down
+    int ysecs = ypos + 24;
+
+    if (omm != mm) { // Redraw hours and minutes time every minute
+      omm = mm;
+      // Draw hours and minutes
+      if (hh < 10) xpos += tft.drawChar('0', xpos, ypos, 8); // Add hours leading zero for 24 hr clock
+      xpos += tft.drawNumber(hh, xpos, ypos, 8);             // Draw hours
+      xcolon = xpos; // Save colon coord for later to flash on/off later
+      xpos += tft.drawChar(':', xpos, ypos - 8, 8);
+      if (mm < 10) xpos += tft.drawChar('0', xpos, ypos, 8); // Add minutes leading zero
+      xpos += tft.drawNumber(mm, xpos, ypos, 8);             // Draw minutes
+      xsecs = xpos; // Sae seconds 'x' position for later display updates
+    }
+    if (oss != ss) { // Redraw seconds time every second
+      oss = ss;
+      xpos = xsecs;
+
+      if (ss % 2) { // Flash the colons on/off
+        tft.setTextColor(0x39C4, TFT_BLACK);        // Set colour to grey to dim colon
+        tft.drawChar(':', xcolon, ypos - 8, 8);     // Hour:minute colon
+        xpos += tft.drawChar(':', xsecs, ysecs, 6); // Seconds colon
+        tft.setTextColor(TFT_YELLOW, TFT_BLACK);    // Set colour back to yellow
+      }
+      else {
+        tft.drawChar(':', xcolon, ypos - 8, 8);     // Hour:minute colon
+        xpos += tft.drawChar(':', xsecs, ysecs, 6); // Seconds colon
+      }
+
+      //Draw seconds
+      if (ss < 10) xpos += tft.drawChar('0', xpos, ysecs, 6); // Add leading zero
+      tft.drawNumber(ss, xpos, ysecs, 6);                     // Draw seconds
+    }
+  }
+    }
+    else if(Clock_Mode == 2) {
+
+    }
+    if(touch.Pressed()) {
+      Serial.println("Pressed");
+      if(touch.Y() < 35) {
+        if(0 < touch.X() && touch.X() < 130) {
+          Clock_Mode = 0;
+          tft.fillRect(0,30,480,5,TFT_BLUE);
+          tft.fillRect(10,30,40,5,TFT_GREEN);
+        }
+        else if(160 < touch.X() && touch.X() < 290) {
+          Clock_Mode = 1;
+          tft.fillRect(0,30,480,5,TFT_BLUE);
+          tft.fillRect(210,30,40,5,TFT_GREEN);
+        }
+        else if(310 < touch.X() && touch.X() < 480) {
+          Clock_Mode = 2;
+          tft.fillRect(0,30,480,5,TFT_BLUE);
+          tft.fillRect(410,30,40,5,TFT_GREEN);
+        }
+      }
+      else {
+        delay(3000);
+        if(touch.Pressed()) {
+          tft.setTextFont(4);
+          tft.setTextSize(1);
+          break;
+        }
+      }
+    }
+    /*
+      tft.setCursor(5,50);
+      tft.setTextSize(3);
+      tft.setTextColor(TFT_YELLOW);
+      tft.print(tm_Year);
+      tft.print("/");
+      tft.print(tm_Month);
+      tft.print("/");
+      tft.print(monthDay);
+      tft.print("-");
+      if(weekDay == 0) {
+        tft.print("7");
+        tft.setTextColor(TFT_WHITE);
+      }
+      else {
+        tft.print(weekDay);
+        tft.setTextColor(TFT_WHITE);
+      }*/
+    //delay(100);
+  }
+}
+
 //Desktop
 void DrawAPP() {
   tft.fillRect(0, 30, 400, 270, tft.color565(0, 0, 30));
@@ -2064,7 +2323,7 @@ void MainPage() {
                 else if (25 < X_Coord && X_Coord < 105 && 145 < Y_Coord && Y_Coord < 225){
                   tft.fillScreen(TFT_BLACK);
                   delay(100);
-                  THMini();
+                  Game();
                 }
                 else if (115 < X_Coord && X_Coord < 195 && 145 < Y_Coord && Y_Coord < 225){
                   tft.fillScreen(TFT_BLACK);

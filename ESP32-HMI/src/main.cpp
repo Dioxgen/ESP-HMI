@@ -26,6 +26,8 @@
   2022/08/13 添加Task Manager
   2022/08/14 完成Album功能
   2022/08/16 修改Task Manager|Debug Vision
+  2022/08/17 开始编写Clock
+  2022/08/19 完善Album
 */
 
 //无线AP名称Teacher WiFi
@@ -45,7 +47,6 @@ void setup() {
   //WiFi.mode(WIFI_OFF);
 
   gfx->begin(40000000);
-
   tft.init();
   tft.fillScreen(TFT_BLACK);
   tft.setRotation(1);
@@ -106,6 +107,8 @@ void setup() {
   //File_transfer();
   //DS1307();
   //MPU_Setup();
+  //WiFiInit("STA");
+  //Clock();
 
   Userlogin();
   line = 1;
