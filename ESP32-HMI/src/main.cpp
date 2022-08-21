@@ -28,6 +28,7 @@
   2022/08/16 修改Task Manager|Debug Vision
   2022/08/17 开始编写Clock
   2022/08/19 完善Album
+  2022/08/21 开始编写 東方微型行
 */
 
 //无线AP名称Teacher WiFi
@@ -49,7 +50,7 @@ void setup() {
   gfx->begin(40000000);
   tft.init();
   tft.fillScreen(TFT_BLACK);
-  tft.setRotation(1);
+  tft.setRotation(3);
   tft.setTextSize(1);
   tft.setTextColor(TFT_WHITE);
   tft.setCursor(0, 0, 4);
@@ -57,7 +58,7 @@ void setup() {
   tft.setSwapBytes(true);
 
   touch.setCal(481, 3395, 755, 3487, 480, 320, 0);
-  touch.setRotation(1);
+  touch.setRotation(3);
 
   pinMode(TFT_BL, OUTPUT);
   digitalWrite(TFT_BL, HIGH);

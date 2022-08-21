@@ -395,6 +395,9 @@ void PlayGame(String name){
   if(name == "THMini") {
     THMini();
   }
+  else if(name == "THMCU") {
+    THMCU();
+  }
 }
 void GameCheck(int gamenum){
   tft.fillScreen(TFT_BLACK);
@@ -518,17 +521,15 @@ void MP3_start_Sounder(const char *afilename,String Musicname) {
         Serial.println("Pressed");
         if (300 < touch.X() && touch.X() < 450 && 100 < touch.Y() && touch.Y() < 140){
           mp3->stop();
-          //Serial.print("Before:");
-          //Serial.println(Music_num);
           Music_num--;
-          //Serial.print("After:");
-          //Serial.println(Music_num);
+          if(readFileLine(filedir.c_str(), Music_num) == "error") {
+            Music_num = MusicEline;
+          }
           EnableMC = 1;
           break;
         }
         else if (((300 < touch.X()) && (touch.X() < 450)) && ((170 < touch.Y()) && (touch.Y() < 210))){
           mp3->stop();
-          //Serial.printf("MP3 done\n");
           MusicPage = -1;
           break;
         }
@@ -540,6 +541,9 @@ void MP3_start_Sounder(const char *afilename,String Musicname) {
           }
           else{
             Music_num++;
+            if(readFileLine(filedir.c_str(), Music_num) == "error") {
+              Music_num = 1;
+            }
             EnableMC = 1;
           }
           break;
@@ -560,6 +564,9 @@ void MP3_start_Sounder(const char *afilename,String Musicname) {
       Serial.printf("MP3 done\n");
       if(MusicState == "List Loop") {
         Music_num++;
+        if(readFileLine(filedir.c_str(), Music_num) == "error") {
+          Music_num = 1;
+        }
         EnableMC = 1;
       }
       else if(MusicState == "Loop"){
@@ -589,8 +596,7 @@ void MusicCheck(int Musicnum){
   filename = readFileLine(filedir.c_str(), Musicnum).substring(strlen);
   filename = filename.substring(0,filename.length()-4);
   MusicName = filename;
-  //tft.setCursor(300,40);
-  //Serial.println(sizeof(filename));
+  Serial.println(MusicName);
 
   filedir = String ("/User/") + User + String("/Config/MusicConfig.txt");
   MusicCover = String("/User/") + User +String("/Data/Music/MusicCover/") + MusicName + String(".jpg");
@@ -1270,10 +1276,10 @@ void Settings(){
 
 //Calculator
 void Calculator(){
-  tft.setRotation(0);
+  tft.setRotation(2);
   tft.setTextColor(TFT_WHITE);
   tft.setTextSize(1);
-  touch.setRotation(0);
+  touch.setRotation(2);
   drawSdJpeg("/System/Widgets/Calculator_kb.jpg", 0, 0);
   tft.setCursor(185,125);
   tft.print("Back / Clear");
@@ -1573,11 +1579,11 @@ void Calculator(){
       }
       else if (270 < X_Coord && X_Coord < 320 && 0 < Y_Coord && Y_Coord < 80) {// f(x)
         tft.fillScreen(TFT_BLACK);
-        tft.setRotation(1);
+        tft.setRotation(3);
         tft.setTextSize(1);
         tft.setTextColor(TFT_WHITE);
         tft.setCursor(1, 270);
-        touch.setRotation(0);
+        touch.setRotation(2);
 
         drawSdJpeg("/System/Widgets/Coordinate_axis.jpg", 0, 0);
         tft.fillCircle(20,280,20,TFT_ORANGE);
@@ -1605,7 +1611,7 @@ void Calculator(){
       else if (255 < X_Coord && X_Coord < 320 && 100 < Y_Coord && Y_Coord < 140) {// C
         tft.setTextColor(TFT_WHITE);
         tft.setTextSize(1);
-        touch.setRotation(0);
+        touch.setRotation(2);
         drawSdJpeg("/System/Widgets/Calculator_kb.jpg", 0, 0);
         tft.setCursor(185,125);
         tft.print("Back / Clear");
@@ -1643,8 +1649,8 @@ void Calculator(){
         }
       }
       else if (0 < X_Coord && X_Coord < 30 && 0 < Y_Coord && Y_Coord < 30) {
-        tft.setRotation(1);
-        touch.setRotation(0);
+        tft.setRotation(3);
+        touch.setRotation(2);
         break;
       }
       delay(250);
@@ -2077,101 +2083,37 @@ void Clock() {
   tft.print("Stopwatch");
   tft.fillRect(230,30,20,5,TFT_GREEN);
 
-  targetTime = millis() + 1000;
+  
   while(1) {
     if(Clock_Mode == 0) {
 
     }
     else if(Clock_Mode == 1) {
-      
-      timeClient.update();
-      epochTime = timeClient.getEpochTime();
-      Serial.println(formattedTime);
-      //tm_Hour = timeClient.getHours();
-      //tm_Minute = timeClient.getMinutes();
-      //tm_Second = timeClient.getSeconds();
-      weekDay = timeClient.getDay();
-      tm *ptm = gmtime ((time_t *)&epochTime);
-      monthDay = ptm->tm_mday;
-      tm_Month = ptm->tm_mon+1;
-      tm_Year = ptm->tm_year+1900;
-      /*
-      tft.setTextSize(1);
-      tft.setTextFont(8);
-      tft.setCursor(40,85);
-      tft.setTextColor(TFT_BLACK);
-      tft.print(formattedTime);
-      formattedTime = timeClient.getFormattedTime();
-      tft.setCursor(40,85);
-      tft.setTextColor(TFT_WHITE);
-      tft.print(formattedTime);
-      
-      tft.drawNumber(timeClient.getHours(),40,85,8);
-      tft.drawChar(':',70,40,8);
-      tft.drawNumber(timeClient.getMinutes(),120,85,8);
-      tft.drawChar(':',150,40,8);
-      tft.drawNumber(timeClient.getSeconds(),200,85,8);
-      tft.drawChar(':',230,40,8);
-      */
+      HTTPClient http;
+      Serial.print("[HTTP] begin...\n");
+      http.begin("http://quan.suning.com/getSysTime.do"); //访问服务器地址
 
-      if (targetTime < millis()) {
-    // Set next update for 1 second later
-    targetTime = millis() + 1000;
+      Serial.print("[HTTP] GET...\n");
+      // start connection and send HTTP header
+      int httpCode = http.GET();
 
-    hh = conv2d(formattedTime.c_str()), mm = conv2d(formattedTime.c_str() + 3), ss = conv2d(formattedTime.c_str() + 6);
+      // httpCode will be negative on error
+      if(httpCode > 0) {
+        // HTTP header has been send and Server response header has been handled
+        Serial.printf("[HTTP] GET... code: %d\n", httpCode);
 
-    // Adjust the time values by adding 1 second
-    ss++;              // Advance second
-    if (ss == 60) {    // Check for roll-over
-      ss = 0;          // Reset seconds to zero
-      omm = mm;        // Save last minute time for display update
-      mm++;            // Advance minute
-      if (mm > 59) {   // Check for roll-over
-        mm = 0;
-        hh++;          // Advance hour
-        if (hh > 23) { // Check for 24hr roll-over (could roll-over on 13)
-          hh = 0;      // 0 for 24 hour clock, set to 1 for 12 hour clock
+        // file found at server
+        if(httpCode == HTTP_CODE_OK) {
+          String payload = http.getString();
+          Serial.println(payload);
+          tft.setCursor(10,10);
+          tft.print(payload);
         }
       }
-    }
-
-
-    // Update digital time
-    int xpos = 0;
-    int ypos = 85; // Top left corner ot clock text, about half way down
-    int ysecs = ypos + 24;
-
-    if (omm != mm) { // Redraw hours and minutes time every minute
-      omm = mm;
-      // Draw hours and minutes
-      if (hh < 10) xpos += tft.drawChar('0', xpos, ypos, 8); // Add hours leading zero for 24 hr clock
-      xpos += tft.drawNumber(hh, xpos, ypos, 8);             // Draw hours
-      xcolon = xpos; // Save colon coord for later to flash on/off later
-      xpos += tft.drawChar(':', xpos, ypos - 8, 8);
-      if (mm < 10) xpos += tft.drawChar('0', xpos, ypos, 8); // Add minutes leading zero
-      xpos += tft.drawNumber(mm, xpos, ypos, 8);             // Draw minutes
-      xsecs = xpos; // Sae seconds 'x' position for later display updates
-    }
-    if (oss != ss) { // Redraw seconds time every second
-      oss = ss;
-      xpos = xsecs;
-
-      if (ss % 2) { // Flash the colons on/off
-        tft.setTextColor(0x39C4, TFT_BLACK);        // Set colour to grey to dim colon
-        tft.drawChar(':', xcolon, ypos - 8, 8);     // Hour:minute colon
-        xpos += tft.drawChar(':', xsecs, ysecs, 6); // Seconds colon
-        tft.setTextColor(TFT_YELLOW, TFT_BLACK);    // Set colour back to yellow
-      }
       else {
-        tft.drawChar(':', xcolon, ypos - 8, 8);     // Hour:minute colon
-        xpos += tft.drawChar(':', xsecs, ysecs, 6); // Seconds colon
+        Serial.printf("[HTTP] GET... failed, error: %s\n", http.errorToString(httpCode).c_str());
       }
-
-      //Draw seconds
-      if (ss < 10) xpos += tft.drawChar('0', xpos, ysecs, 6); // Add leading zero
-      tft.drawNumber(ss, xpos, ysecs, 6);                     // Draw seconds
-    }
-  }
+      http.end();
     }
     else if(Clock_Mode == 2) {
 
@@ -2204,25 +2146,6 @@ void Clock() {
         }
       }
     }
-    /*
-      tft.setCursor(5,50);
-      tft.setTextSize(3);
-      tft.setTextColor(TFT_YELLOW);
-      tft.print(tm_Year);
-      tft.print("/");
-      tft.print(tm_Month);
-      tft.print("/");
-      tft.print(monthDay);
-      tft.print("-");
-      if(weekDay == 0) {
-        tft.print("7");
-        tft.setTextColor(TFT_WHITE);
-      }
-      else {
-        tft.print(weekDay);
-        tft.setTextColor(TFT_WHITE);
-      }*/
-    //delay(100);
   }
 }
 
@@ -2244,6 +2167,7 @@ void DrawAPP() {
     drawSdJpeg("/System/APP/File_transfer/File_transfer.jpg", 115, 55);
     drawSdJpeg("/System/APP/Network/Network.jpg", 205, 55);
     drawSdJpeg("/System/APP/Task_Manager/Task_Manager.jpg", 295, 55);
+    drawSdJpeg("/System/APP/Clock/Clock.jpg", 25, 145);
   }
   tft.fillRoundRect(25,255,80,20,5,TFT_DARKGREY);
   tft.fillRoundRect(295,255,80,20,5,TFT_DARKGREY);
@@ -2255,7 +2179,7 @@ void DrawAPP() {
 }
 void MainPage() {
   tft.setCursor(0, 300, 4);
-  touch.setRotation(1);
+  touch.setRotation(3);
 
   jpgdir = String ("/User/") + User + String("/Data/Others/") + String("Desktop.jpg");
   if (SD_MMC.exists(jpgdir.c_str())){
@@ -2361,6 +2285,11 @@ void MainPage() {
                   tft.fillScreen(TFT_BLACK);
                   delay(100);
                   Task_Manager();
+                }
+                else if (25 < X_Coord && X_Coord < 105 && 145 < Y_Coord && Y_Coord < 225){
+                  tft.fillScreen(TFT_BLACK);
+                  delay(100);
+                  Clock();
                 }
               }
             }

@@ -404,7 +404,38 @@ void SD_read_Time(uint32_t msTime) {
   Serial.println(F(" ms "));
 }
 
-//Game-TH-Mini
+//mp3 Player:
+#include <AudioFileSourceFS.h>
+#include <AudioFileSourceID3.h>
+#include <AudioGeneratorMP3.h>
+#include <AudioOutputI2S.h>
+
+AudioGeneratorMP3 *mp3;
+AudioFileSourceFS *file;
+AudioOutputI2S *out;
+
+int fileline = 1;
+
+void MP3_start(const char *filename) {
+  file = new AudioFileSourceFS(SD_MMC, filename);
+  out = new AudioOutputI2S(0, 1, 128);
+  mp3 = new AudioGeneratorMP3();
+  mp3->begin(file, out);
+  while (1) {
+    if (mp3->isRunning()) {
+      if (!mp3->loop()) {
+        fileline = 1;
+        mp3->stop();
+      }
+    }
+    else {
+      Serial.printf("MP3 done\n");
+      break;
+    }
+  }
+}
+
+//Game
 #include <TFT_Touch.h>
 
 #define DOUT 32  // Data out pin    (T_DO)  of touch screen
@@ -413,15 +444,39 @@ void SD_read_Time(uint32_t msTime) {
 #define DCLK 0   // Clock pin       (T_CLK) of touch screen
 TFT_Touch touch = TFT_Touch(DCS, DCLK, DIN, DOUT);
 
+//============================================================THMini
 int y = 0;
 int spd = 25;
 int obj = 1;
 int score = 0;
 int state = 0;
+//============================================================THMCU
+int BGM_Start = 1;
+int BGM_Stage_1_Start = 1;
+int GameDecision_Start = 1;
+int DrawStart = 0;
 
+int Player_x = 140; //stickers
+int Player_y = 400;
+
+int Player_DecisionPoint_x = 160; //Decision Point
+int Player_DecisionPoint_y = 460;
+
+int Bullet_1_x = 160;
+int Bullet_1_y = 0;
+int Bullet_1_Usable = 1;
+int Bullet_1_Round = 1;
+
+int Bullet_2_x = 140;
+int Bullet_2_y = 0;
+int Bullet_2_Usable = 1;
+int Bullet_2_Round = 1;
+//============================================================
+
+//THMini
 void THMini() {
-  tft.setRotation(0);
-  touch.setRotation(0);
+  tft.setRotation(2);
+  touch.setRotation(2);
   tft.setTextSize(1);
   tft.setTextDatum(MC_DATUM);
   state = 0;
@@ -489,13 +544,226 @@ void THMini() {
       }
     }
     else if(touch.Pressed()){
-      tft.setRotation(1);
-      touch.setRotation(1);
+      tft.setRotation(3);
+      touch.setRotation(3);
       EnableGC = 1;
       break;
     }
     else {
       delay(30);
+    }
+  }
+}
+
+//THMCU
+void Bullet_init() {
+  Bullet_1_x = 160;
+  Bullet_1_y = 0;
+  Bullet_1_Usable = 1;
+  Bullet_1_Round = 1;
+
+  Bullet_2_x = 140;
+  Bullet_2_y = 0;
+  Bullet_2_Usable = 1;
+  Bullet_2_Round = 1;
+}
+void GameOver() {
+  tft.fillScreen(tft.color565(160, 245, 255));
+  tft.setCursor(30,100);
+  tft.setTextSize(2);
+  tft.print("Game Over");
+
+  Bullet_init();
+}
+void MoveBullet() {
+
+  if(Bullet_1_Usable == 1) {
+    if(Bullet_1_Round == 1) {
+      tft.fillCircle(Bullet_1_x,Bullet_1_y,10,tft.color565(160, 245, 255));   //Bullet 1 Round 1
+      if(Bullet_1_y < 500 && Bullet_1_Usable == 1) {
+        Bullet_1_y++;
+      }
+      else {
+        Bullet_1_Usable = 0;
+      }
+      tft.fillCircle(Bullet_1_x,Bullet_1_y,10,TFT_GREEN);
+    }
+    else if(Bullet_1_Round == 2) {
+      tft.fillCircle(Bullet_1_x,Bullet_1_y,10,tft.color565(160, 245, 255));   //Bullet 1 Round 1
+      if(Bullet_1_y < 500 && Bullet_1_Usable == 1) {
+        Bullet_1_y++;
+      }
+      else {
+        Bullet_1_Usable = 0;
+      }
+      tft.fillCircle(Bullet_1_x,Bullet_1_y,10,TFT_RED);
+    }
+  }
+  //delay(50);
+}
+void GameDecision() {
+  if((Player_x + 10) < Bullet_1_x && Bullet_1_x < (Player_x + 30) && (Player_y + 25) < Bullet_1_y && Bullet_1_y < (Player_y + 40)) {
+    GameOver();
+  }
+}
+void BGMTask_Stage_1(void* Parameter) {
+  Userdir = String ("/User/") + User + String("/Data/Game/GameData/THMCU/audio/Stage_1.mp3");
+  file = new AudioFileSourceFS(SD_MMC, Userdir.c_str());
+  out = new AudioOutputI2S(0, 1, 128);
+  mp3 = new AudioGeneratorMP3();
+  mp3->begin(file, out);
+
+  while(BGM_Stage_1_Start) {
+    if (mp3->isRunning()) {
+      if (!mp3->loop()) {
+        mp3->stop();
+        file = new AudioFileSourceFS(SD_MMC, Userdir.c_str());
+        out = new AudioOutputI2S(0, 1, 128);
+        mp3 = new AudioGeneratorMP3();
+        mp3->begin(file, out);
+      }
+    }
+    else {
+      mp3->stop();
+      file = new AudioFileSourceFS(SD_MMC, Userdir.c_str());
+      out = new AudioOutputI2S(0, 1, 128);
+      mp3 = new AudioGeneratorMP3();
+      mp3->begin(file, out);
+    }
+  }
+  if(BGM_Stage_1_Start == 0) {
+    mp3->stop();
+    vTaskDelete(NULL);
+  }
+}
+void BGMTask_Start(void* Parameter) {
+  Userdir = String ("/User/") + User + String("/Data/Game/GameData/THMCU/audio/BackGround.mp3");
+  file = new AudioFileSourceFS(SD_MMC, Userdir.c_str());
+  out = new AudioOutputI2S(0, 1, 128);
+  mp3 = new AudioGeneratorMP3();
+  mp3->begin(file, out);
+
+  while(BGM_Start) {
+    if (mp3->isRunning()) {
+      if (!mp3->loop()) {
+        mp3->stop();
+        file = new AudioFileSourceFS(SD_MMC, Userdir.c_str());
+        out = new AudioOutputI2S(0, 1, 128);
+        mp3 = new AudioGeneratorMP3();
+        mp3->begin(file, out);
+      }
+    }
+    else {
+      mp3->stop();
+      file = new AudioFileSourceFS(SD_MMC, Userdir.c_str());
+      out = new AudioOutputI2S(0, 1, 128);
+      mp3 = new AudioGeneratorMP3();
+      mp3->begin(file, out);
+    }
+  }
+  if(BGM_Start == 0) {
+    mp3->stop();
+    vTaskDelete(NULL);
+  }
+}
+void THMCU() {
+  tft.setRotation(2);
+  touch.setRotation(2);
+  Userdir = String ("/User/") + User + String("/Data/Game/GameData/THMCU/image/BackGround.jpg");
+  drawSdJpeg(Userdir.c_str(), 0, 0);
+  BGM_Start = 1;
+  xTaskCreatePinnedToCore(BGMTask_Start, "BGMTask_Start", 50000, NULL, 1, NULL, 0);
+
+  while(1) {
+    if(touch.Pressed()) {
+      if(10 < touch.X() && touch.X() < 80 && 165 < touch.Y() && touch.Y() < 195) {  //Start
+        BGM_Start = 0;
+        BGM_Stage_1_Start = 1;
+        Bullet_init();
+
+        tft.fillScreen(tft.color565(160, 245, 255));
+        Userdir = String ("/User/") + User + String("/Data/Game/GameData/THMCU/image/Reimu_player.jpg");
+        drawSdJpeg(Userdir.c_str(), Player_x, Player_y);
+        tft.setTextColor(tft.color565(209, 95, 11));
+        tft.setCursor(30,100);
+        tft.setTextSize(2);
+        tft.print("Stage 1");
+        tft.setCursor(30,160);
+        tft.setTextSize(1);
+        tft.print("Fall into MCU...");
+        delay(2500);
+        xTaskCreatePinnedToCore(BGMTask_Stage_1, "BGMTask_Stage_1", 50000, NULL, 1, NULL, 0);
+        tft.fillScreen(tft.color565(160, 245, 255));
+        Userdir = String ("/User/") + User + String("/Data/Game/GameData/THMCU/image/Reimu_player.jpg");
+        drawSdJpeg(Userdir.c_str(), Player_x, Player_y);
+        //xTaskCreatePinnedToCore(GameDecision, "GameDecision", 10000, NULL, 1, NULL, 0);
+        while(1) {
+          if(touch.Pressed()) {
+            tft.fillRect(Player_x - 15,Player_y - 15,90,110,tft.color565(160, 245, 255));
+            if(0 < touch.X() && touch.X() < 160 && 0 < touch.Y() && touch.Y() < 120) {
+              if(Player_y > 0) {
+                Player_y = Player_y - 14;
+              }
+            }
+            else if(160 < touch.X() && touch.X() < 320 && 0 < touch.Y() && touch.Y() < 120) {
+              if(Player_y < 400) {
+                Player_y = Player_y + 14;
+              }
+            }
+            else if(0 < touch.X() && touch.X() < 160 && 120 < touch.Y() && touch.Y() < 240) {
+              if(Player_x > 0) {
+                Player_x = Player_x - 14;
+              }
+            }
+            else if(160 < touch.X() && touch.X() < 320 && 120 < touch.Y() && touch.Y() < 240) {
+              if(Player_x < 280) {
+                Player_x = Player_x + 14;
+              }
+            }
+            else if(0 < touch.X() && touch.X() < 50 && 430 < touch.Y() && touch.Y() < 480){
+              BGM_Stage_1_Start = 0;
+              BGM_Start = 1;
+              xTaskCreatePinnedToCore(BGMTask_Start, "BGMTask_Start", 50000, NULL, 1, NULL, 0);
+              DrawStart = 1;
+              break;
+            }
+            drawSdJpeg(Userdir.c_str(), Player_x, Player_y);
+          }
+          MoveBullet();
+          GameDecision();
+        }
+      }
+      else if(40 < touch.X() && touch.X() < 205 && 205 < touch.Y() && touch.Y() < 235) {  //Intro
+        Userdir = String ("/User/") + User + String("/Data/Game/GameData/THMCU/image/Introduction.jpg");
+        drawSdJpeg(Userdir.c_str(), 0, 0);
+        while(1) {
+          if(touch.Pressed()) {
+            if(135 < touch.X() && touch.X() < 190 && 360 < touch.Y() && touch.Y() < 390) {
+              DrawStart = 1;
+              break;
+            }
+          }
+        }
+      }
+      else if(60 < touch.X() && touch.X() < 140 && 250 < touch.Y() && touch.Y() < 280) {  //Score
+
+      }
+      else if(10 < touch.X() && touch.X() < 180 && 290 < touch.Y() && touch.Y() < 320) {  //Music Room
+
+      }
+      else if(25 < touch.X() && touch.X() < 85 && 340 < touch.Y() && touch.Y() < 370) {   //Quit
+        BGM_Start = 0;
+        tft.setRotation(3);
+        touch.setRotation(3);
+        EnableGC = 1;
+        break;
+      }
+      if(DrawStart == 1) {
+        DrawStart = 0;
+        String jpg;
+        jpg = String("/User/") + User + String("/Data/Game/GameData/THMCU/image/BackGround.jpg");
+        drawSdJpeg(jpg.c_str(), 0, 0);
+      }
     }
   }
 }
@@ -508,8 +776,8 @@ int Y_Coord;
 unsigned int colors[10] = {TFT_RED, TFT_GREEN, TFT_BLUE, TFT_BLACK, TFT_CYAN, TFT_YELLOW, TFT_WHITE, TFT_MAGENTA, TFT_BLACK, TFT_BLACK};
 
 void draw() {
-  tft.setRotation(1);
-  touch.setRotation(1);
+  tft.setRotation(3);
+  touch.setRotation(3);
   tft.setTextSize(1);
   tft.fillScreen(TFT_BLACK);
   tft.setTextColor(TFT_GREEN);
@@ -548,37 +816,6 @@ void draw() {
       else {
         tft.fillCircle(X_Coord, Y_Coord, 2, color);
       }
-    }
-  }
-}
-
-//mp3 Player:
-#include <AudioFileSourceFS.h>
-#include <AudioFileSourceID3.h>
-#include <AudioGeneratorMP3.h>
-#include <AudioOutputI2S.h>
-
-AudioGeneratorMP3 *mp3;
-AudioFileSourceFS *file;
-AudioOutputI2S *out;
-
-int fileline = 1;
-
-void MP3_start(const char *filename) {
-  file = new AudioFileSourceFS(SD_MMC, filename);
-  out = new AudioOutputI2S(0, 1, 128);
-  mp3 = new AudioGeneratorMP3();
-  mp3->begin(file, out);
-  while (1) {
-    if (mp3->isRunning()) {
-      if (!mp3->loop()) {
-        fileline = 1;
-        mp3->stop();
-      }
-    }
-    else {
-      Serial.printf("MP3 done\n");
-      break;
     }
   }
 }
@@ -785,21 +1022,7 @@ void CreatCrollWords(int IWIDTH, int IHEIGHT, int WAIT, int X, int Y,int size,in
     pos = IWIDTH;
     a = 1;
   }
-}/*
-void CreatCrollWords(int IWIDTH,int pos, int IHEIGHT, int WAIT, int X, int Y,int size,int font, uint16_t TextColor, String msg){
-  while (1) {
-    // Create the sprite and clear background to black
-    img.createSprite(IWIDTH, IHEIGHT);
-    for (int pos = IWIDTH; pos > 0; pos--) {
-      img.fillSprite(tft.color565(0, 128, 255));
-      build_banner(IWIDTH,IHEIGHT,msg, pos, size, font, TextColor);
-      img.pushSprite(X, Y);
-      delay(WAIT);
-    }
-    // Delete sprite to free up the memory
-    img.deleteSprite();
-  }
-}*/
+}
 
 //Thermometer
 #include <SHT3x.h>
@@ -825,15 +1048,16 @@ void GetfromMometer(){
 }
 
 //Network
-#include <NTPClient.h>
+//#include <NTPClient.h>
+#include <HTTPClient.h>
 #include <WiFiUdp.h>
 #include <WiFiClient.h>
 #include <WiFiAP.h>
 #include <WiFiMulti.h>
 
-#define NTP_OFFSET  28800
-#define NTP_INTERVAL 1 * 1000
-#define NTP_ADDRESS "210.72.145.39"//"ntp.ntsc.ac.cn"
+//#define NTP_OFFSET  28800
+//#define NTP_INTERVAL 1 * 1000
+//#define NTP_ADDRESS "210.72.145.39"//"ntp.ntsc.ac.cn"
 
 const char *ssid = "ESP-HMI";
 const char *psword = "123456789";
@@ -844,7 +1068,7 @@ uint8_t IPAD1 = 0;        //TP-LINK：0 ，水星：1 ，华为：3 ，小米：
 uint8_t IPAD2 = 254;      //自行设置 2~254
 
 WiFiUDP ntpUDP;
-NTPClient timeClient(ntpUDP, NTP_ADDRESS, NTP_OFFSET, NTP_INTERVAL);
+//NTPClient timeClient(ntpUDP, NTP_ADDRESS, NTP_OFFSET, NTP_INTERVAL);
 WiFiMulti wifiMulti;
 
 void WiFiInit(String Mode){
@@ -1294,33 +1518,4 @@ float GetBatteryRemainingTime() {
 }
 
 //Clock
-unsigned long epochTime = timeClient.getEpochTime();
-String formattedTime = timeClient.getFormattedTime();
-
-struct tm *ptm = gmtime ((time_t *)&epochTime);
-
-//int tm_Hour = timeClient.getHours();
-//int tm_Minute = timeClient.getMinutes();
-//int tm_Second = timeClient.getSeconds();
-int weekDay = timeClient.getDay();
-int monthDay = ptm->tm_mday;
-int tm_Month = ptm->tm_mon+1;
-int tm_Year = ptm->tm_year+1900;
 int Clock_Mode = 1;//0-Alarm;1-Clock;2-Stopwatch
-
-uint32_t targetTime = 0;                    // for next 1 second timeout
-
-static uint8_t conv2d(const char* p); // Forward declaration needed for IDE 1.6.x
-
-uint8_t hh, mm, ss; // Get H, M, S from compile time
-
-byte omm = 99, oss = 99;
-byte xcolon = 0, xsecs = 0;
-unsigned int colour = 0;
-
-static uint8_t conv2d(const char* p) {
-  uint8_t v = 0;
-  if ('0' <= *p && *p <= '9')
-    v = *p - '0';
-  return 10 * v + *++p - '0';
-}
