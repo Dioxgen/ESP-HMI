@@ -29,6 +29,7 @@
   2022/08/17 开始编写Clock
   2022/08/19 完善Album
   2022/08/21 开始编写 東方微型行
+  2022/08/29 修复了用户名长度的问题
 */
 
 //无线AP名称Teacher WiFi
@@ -47,7 +48,7 @@ void setup() {
   Serial.begin(115200);
   //WiFi.mode(WIFI_OFF);
 
-  gfx->begin(40000000);
+  gfx->begin();
   tft.init();
   tft.fillScreen(TFT_BLACK);
   tft.setRotation(3);
@@ -120,6 +121,7 @@ void setup() {
   Refresh();
   tft.setTextColor(TFT_WHITE);
   Serial.println(User);
+  Serial.print(User.length());
 }
 
 void loop() {

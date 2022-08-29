@@ -102,7 +102,7 @@ void listUser(int UserPage) {
   tft.setTextColor(TFT_BLACK);
 
   UserBline = (UserPage * 2) - 1;
-  UserEline = UserPage + 1;
+  UserEline = UserBline + 1;
 
   strlen = strlen + 35;
   Serial.printf("strlen: %d\n",strlen);
@@ -112,7 +112,7 @@ void listUser(int UserPage) {
   
   while (UserBline <= UserEline) {
     User = readFileLine("/System/Users/Users.txt", UserBline);
-    strlen = sizeof(User);
+    strlen = User.length();
     strlen = strlen + 23;
     filedir = String ("/User/") + User + String("/Data/Others/") + User + String(".jpg");
     User_head_portrait = filedir;
@@ -233,8 +233,8 @@ void ImageCheck(int Imagenum){
   int strlen = 0;
   String filename;
 
-  strlen = sizeof(User);
-  strlen = strlen + 13;
+  strlen = User.length();
+  strlen = strlen + 18;
   filedir = String ("/User/") + User + String("/Config/ImageConfig.txt");
   filename = readFileLine(filedir.c_str(), Imagenum).substring(strlen);
   filename = filename.substring(0,filename.length()-4);
@@ -295,7 +295,7 @@ void Album() {
   tft.setTextColor(TFT_BLACK);
 
   filedir = String ("/User/") + User + String("/Config/ImageConfig.txt");
-  strlen = sizeof(User);
+  strlen = User.length();
   
   listImage(ImagePage);
 
@@ -429,15 +429,15 @@ void listGame(int GamePage){
   GameBline = (GamePage * 2) - 1;
   GameEline = GamePage + 1;
 
-  strlen = strlen + 35;
+  //strlen = strlen + 35;
   Serial.printf("strlen: %d\n",strlen);
 
   Serial.println(GameBline);
   Serial.println(GameEline);
 
   while (GameBline <= GameEline) {
-    strlen = sizeof(User);
-    strlen = strlen + 23;
+    //strlen = User.length();
+    //strlen = strlen + 23;
     filedir = String ("/User/") + User + String("/Config/GameConfig.txt");
     GameName = readFileLine(filedir.c_str(), GameBline);
     Serial.printf("GameName: %s\n", GameName.c_str());
@@ -590,8 +590,8 @@ void MusicCheck(int Musicnum){
   String MusicCover;
 
   tft.setTextColor(TFT_WHITE);
-  strlen = sizeof(User);
-  strlen = strlen + 23;
+  strlen = User.length();
+  strlen = strlen + 28;
   filedir = String ("/User/") + User + String("/Config/MusicConfig.txt");
   filename = readFileLine(filedir.c_str(), Musicnum).substring(strlen);
   filename = filename.substring(0,filename.length()-4);
@@ -739,9 +739,8 @@ void Music(){
   tft.setTextColor(TFT_BLACK);
 
   filedir = String ("/User/") + User + String("/Config/MusicConfig.txt");
-  strlen = sizeof(User);
+  strlen = User.length();
   Serial.printf("strlen: %d\n",strlen);
-//  strlen = strlen + sizeof(String("/User/SoTWild/Data/Music/MusicData/"));
   
   listMusic(MusicPage);
 
@@ -830,8 +829,8 @@ void VideoCheck(int videonum){
 
   tft.fillScreen(TFT_BLACK);
   IfVision = 1;
-  strlen = sizeof(User);
-  strlen = strlen + 24;
+  strlen = User.length();
+  strlen = strlen + 29;
   filedir = String ("/User/") + User + String("/Config/VideoConfig.txt");
   filename = readFileLine(filedir.c_str(), videonum).substring(strlen);
   filename = filename.substring(0,filename.length() - 4 );//.jpg
@@ -872,8 +871,8 @@ void listVideo(int VideoPage){
   Serial.println(VideoEline);
 
   while (VideoBline <= VideoEline) {
-    strlen = sizeof(User);
-    strlen = strlen + 24;
+    strlen = User.length();
+    strlen = strlen + 29;
     filedir = String ("/User/") + User + String("/Config/VideoConfig.txt");
     filename = readFileLine(filedir.c_str(), VideoBline).substring(strlen);
     Serial.print("1 Video name: ");
@@ -1020,8 +1019,8 @@ void listEbook(int BookPage){
   Serial.println(BookEline);
 
   while (BookBline <= BookEline) {
-    strlen = sizeof(User);
-    strlen = strlen + 23;
+    strlen = User.length();
+    strlen = strlen + 28;
     filedir = String ("/User/") + User + String("/Config/EbookConfig.txt");
     filename = readFileLine(filedir.c_str(), BookBline).substring(strlen);
     filename = filename.substring(0,filename.length() - 4 );//.txt
