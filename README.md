@@ -4,7 +4,7 @@
 
 ###### [[Engilsh](README-EN)|简体中文]
 
-<img src="https://i2.imgu.cc/images/2022/08/12/CMhEY.jpg" style="zoom:8%;" />
+<img src="https://s3.bmp.ovh/imgs/2022/10/28/daf94f94fd847e51.png" style="zoom: 67%;" />
 
 <center>成品图</center>
 
@@ -52,9 +52,9 @@ ESP-HMI 是 Link 设备链中的一个，是整个项目最**难**开发的部�
 
 #### 项目开发人员：
 
-$SoTWild$
+[$SoTWild$](https://github.com/SoTWild)
 
-![GitHub Streak](https://github-readme-streak-stats.herokuapp.com?user=SoTWild&theme=vue-dark&hide_border=true&locale=zh)
+<img src="https://s3.bmp.ovh/imgs/2022/10/29/ffaaa19ca3283bd3.jpg" style="zoom:7%; float:left" />
 
 ------
 
@@ -74,7 +74,7 @@ $$< 100 ￥$$
 
 #### 4）成品的体积？
 
-全面屏，**4.2吋**TFT屏幕，**长$$8.5cm$$，宽$$5.5cm$$，厚$$12mm$$**（不加电池）。
+全面屏，**3.5吋**TFT屏幕，**长$$8.5cm$$，宽$$5.5cm$$，厚$$12mm$$**（不加电池）。
 
 #### 5）支持的SD卡容量？
 
@@ -86,7 +86,7 @@ $$< 100 ￥$$
 
 #### 7）开发环境？
 
-Visual Studio Code，Platform IO
+Visual Studio Code + Platform IO
 
 ------
 
@@ -196,7 +196,7 @@ Visual Studio Code，Platform IO
 >
 > 触摸芯片：XPT2046
 
-<img src="https://i2.imgu.cc/images/2022/08/15/CXwkV.jpg" style="zoom:35%;" />
+<img src="https://s3.bmp.ovh/imgs/2022/10/28/d460827e10d3bd94.jpg" style="zoom:33%;" />
 
 <center>屏幕模块</center>
 
@@ -204,7 +204,7 @@ Visual Studio Code，Platform IO
 
 最大 **32G**，推荐 4 或 8G。
 
-<img src="https://i2.imgu.cc/images/2022/08/15/CX4sh.jpg" style="zoom:15%;" />
+<img src="https://s3.bmp.ovh/imgs/2022/10/28/5821d740d8bbdd5c.jpg" style="zoom:15%;" />
 
 <center>32G TF卡</center>
 
@@ -265,7 +265,7 @@ USB转串口芯片，支持通讯波特率50bps～2Mbps。
 
 此型号内置时钟，无需外部晶振。
 
-<img src="https://dsindustrie.com/wp-content/uploads/2018/07/Convertisseur-CH340C-Micro-USB-vers-TTL-Maroc.jpg" style="zoom:20%;" />
+<img src="https://s3.bmp.ovh/imgs/2022/10/28/b04057c7ae1ef853.jpg" style="zoom:20%;" />
 
 <center>搭载了CH340C的串口下载模块</center>
 
@@ -311,7 +311,7 @@ WT8302系列是一款**超低EM.3.0W,单声道,D类音频功率放大器**。在
 
 [Gerber_PCB_ESP32开发直插板.zip](https://github.com/SoTWild/ESP-HMI/raw/main/PCB/%E7%9B%B4%E6%8F%92%E6%9D%BF/Gerber_PCB_ESP32%E5%BC%80%E5%8F%91%E7%9B%B4%E6%8F%92%E6%9D%BF.zip)
 
-<img src="https://i2.imgu.cc/images/2022/04/27/CK8ux.jpg" style="zoom:10%;" />
+<img src="https://s3.bmp.ovh/imgs/2022/10/28/a3fdfc84d8914a23.webp" style="zoom:10%;" />
 
 <center>验证板</center>
 
@@ -335,21 +335,21 @@ WT8302系列是一款**超低EM.3.0W,单声道,D类音频功率放大器**。在
 
 ##### 原理图：
 
-![](https://i2.imgu.cc/images/2022/07/31/CDxdv.png)
+![](https://s3.bmp.ovh/imgs/2022/10/28/73dab4828ad2bf56.webp)
 
-![](https://i2.imgu.cc/images/2022/07/31/CDuRL.png)
+![](https://s3.bmp.ovh/imgs/2022/10/28/d169f816bd14a523.webp)
 
 ##### PCB图：
 
-![](https://i2.imgu.cc/images/2022/07/31/CD7CZ.png)
+![](https://s3.bmp.ovh/imgs/2022/10/28/5c970341434f300c.webp)
 
 ##### 实物图：
 
-<img src="https://i2.imgu.cc/images/2022/08/12/CMHy3.jpg" style="zoom:50%;" />
+<img src="https://s3.bmp.ovh/imgs/2022/10/29/c7d764ff55f6910b.png" style="zoom:50%;" />
 
 <center>未更正</center>
 
-<img src="https://i2.imgu.cc/images/2022/08/14/CM1tt.jpg" style="zoom:10%;" />
+<img src = 'https://s3.bmp.ovh/imgs/2022/10/29/04793d0fa1468b5a.png' style="zoom:35%;"  >
 
 <center>飞线后</center>
 
@@ -667,7 +667,7 @@ void appendDir(fs::FS &fs, const char * dirname, String filename, uint8_t levels
 
 **.mp4转.mjpeg**的方法：下载**ffmpeg**，[Play Video With ESP32](https://www.instructables.com/Play-Video-With-ESP32/)，使用指令：
 
-```c
+```cmd
 ffmpeg -i input.mp4 -vf "fps=30" output.mjpeg
 ```
 
@@ -675,7 +675,7 @@ ffmpeg -i input.mp4 -vf "fps=30" output.mjpeg
 
 这是**.mp4转.pcm**：
 
-```c
+```cmd
 ffmpeg -i input.mp4 -f u16be -acodec pcm_u16le -ar 44100 -ac 1 output.pcm
 ```
 
@@ -788,13 +788,13 @@ ffmpeg -i input.mp4 -f u16be -acodec pcm_u16le -ar 44100 -ac 1 output.pcm
 
 原因：原设计有缺陷，根据**信号测量**可以判定**失败**。
 
-![](https://i2.imgu.cc/images/2022/08/14/CMzsv.jpg)
+![](https://s3.bmp.ovh/imgs/2022/10/29/05a10152abf33ff3.jpg)
 
-![](https://i2.imgu.cc/images/2022/08/14/CMSiL.jpg)
+![](https://s3.bmp.ovh/imgs/2022/10/29/000c899e9800d003.jpg)
 
 <center>电源纹波</center>
 
-![](https://i2.imgu.cc/images/2022/08/14/CM2BZ.jpg)
+![](https://s3.bmp.ovh/imgs/2022/10/29/7cfef5e36d0e23e2.jpg)
 
 <center>晶振波形，已经失控了</center>
 
@@ -802,13 +802,13 @@ ffmpeg -i input.mp4 -f u16be -acodec pcm_u16le -ar 44100 -ac 1 output.pcm
 
 原因：ESP32 DAC 精度为 **8-bit**，理论只可以输出**256**个值。
 
-![](https://i2.imgu.cc/images/2022/08/14/CM3bl.jpg)
+![](https://s3.bmp.ovh/imgs/2022/10/29/249324eb40188aec.jpg)
 
 <center>放大后的音频波形</center>
 
-（4）在（1）中，断开IO25后，可以将其连接上耳机插座，实现双声道。
+（4）在（1）中，断开`IO25`后，可以将其连接上耳机插座，实现双声道。
 
-原因：ESP32 中，IO25 为 **DAC Channel 1**，是**左**声道；IO26 为 **DAC Channel 2**，是**右**声道。原设计中耳机的**两声道并联**，由 **IO26** 提供**右**声道信号。
+原因：ESP32 中，`IO25` 为 **DAC Channel 1**，是**左**声道；`IO26` 为 **DAC Channel 2**，是**右**声道。原设计中耳机的**两声道并联**，由 `IO26` 提供**右**声道信号。
 
 （5）注意屏幕插座要买**插接上接式40p插座**，**而不是翻盖式**。
 
@@ -833,13 +833,13 @@ void setRotation(byte rotation);
 
 （3）在TFT_eSPI库`/User_Setups/Setup21_ILI9488.h`中，设置了`SPI_FREQUENCY`为**40MHz**，80MHz会出现**花屏**现象。
 
-注：若将屏幕更换为**ST7796**驱动芯片的类型可能解决花屏问题（待测试）
+注：若将屏幕更换为**ST7796**驱动芯片的类型再**优化PCB布线**可能会解决花屏问题（待测试）
 
-![](https://i2.imgu.cc/images/2022/08/15/CXNbO.jpg)
+![](https://s3.bmp.ovh/imgs/2022/10/29/547a915b916ece67.jpg)
 
 <center>修改前的CLK信号：40MHz</center>
 
-![](https://i2.imgu.cc/images/2022/08/15/CXktS.jpg)
+![](https://s3.bmp.ovh/imgs/2022/10/29/34607370573d189a.jpg)
 
 <center>修改后的CLK信号：80MHz</center>
 
@@ -879,7 +879,7 @@ $$
 
 如果出现**404**错误，可以在**本地**一个文件夹**按 Shift 再右键**打开 **Power Shell 窗口**使用
 
-```c
+```cmd
 git clone https://github.com/SoTWild/ESP-HMI.git
 ```
 
@@ -949,4 +949,4 @@ git clone https://github.com/SoTWild/ESP-HMI.git
 
 ------
 
-<img src="https://i2.imgu.cc/images/2022/08/14/CMaaF.png" style="zoom:25%;" />
+<img src="https://s3.bmp.ovh/imgs/2022/10/29/cdb82a3592add309.webp" style="zoom:25%;" />
