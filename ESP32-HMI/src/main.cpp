@@ -63,9 +63,9 @@ void setup() {
 
   pinMode(TFT_BL, OUTPUT);
   digitalWrite(TFT_BL, HIGH);
-  pinMode(35,INPUT_PULLUP);//interrupt
+  //pinMode(35,INPUT_PULLUP);//interrupt
   pinMode(34,INPUT);//Battery
-  //attachInterrupt(35, tft_BL, RISING);
+  //attachInterrupt(digitalPinToInterrupt(35), BACKLIGHT, FALLING);
   
   /*
     ledcAttachPin(TFT_BL, 1);

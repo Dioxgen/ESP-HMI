@@ -6,7 +6,7 @@ String Userdir;
 String filedir;
 String filedir2;
 String bookdir;
-String password = "9961";
+String password = ""; //You Can Preset
 String MusicName;
 String MusicState = "List Loop";
 String VideoName;

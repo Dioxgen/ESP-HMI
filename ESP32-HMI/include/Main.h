@@ -226,6 +226,18 @@ void NewUser(fs::FS &fs, const char *UserName) {
   file.close();
 }
 
+void BACKLIGHT() {
+  delayMicroseconds(20000);
+  TFT_bl_state = !TFT_bl_state;
+  Serial.println(TFT_bl_state);
+  if(TFT_bl_state) {
+    digitalWrite(TFT_BL, HIGH);
+  }
+  else {
+    digitalWrite(TFT_BL, LOW);
+  }
+}
+
 //Album
 void ImageCheck(int Imagenum){
   Image_num = Imagenum;
@@ -510,7 +522,7 @@ void MP3_start_Sounder(const char *afilename,String Musicname) {
 
   file = new AudioFileSourceFS(SD_MMC, afilename);
   out = new AudioOutputI2S(0, 1, 128);
-  out -> SetGain(1.0); //max 4.0
+  out -> SetGain(1.5); //max 4.0
   mp3 = new AudioGeneratorMP3();
   mp3->begin(file, out);
   
@@ -2201,7 +2213,7 @@ void MainPage() {
     if (touch.Pressed()) {
       X_Coord = touch.X();
       Y_Coord = touch.Y();
-      if     (X_Coord < 30 && 300 < Y_Coord) {
+      //if     (X_Coord < 50 && 240 < Y_Coord) {
         DrawAPP();
         while(1){
           if (touch.Pressed()) {
@@ -2297,7 +2309,7 @@ void MainPage() {
             }
           }
         }
-      }
+      //}
     }
   }
 }
