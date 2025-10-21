@@ -1,6 +1,6 @@
 # ESP-HMI
 
-###### 【Designed by SoTWild】[![](https://img.shields.io/badge/My Website-当代研究所-brightgreen.svg)]({linkUrl}) ![](https://img.shields.io/badge/Licence-GPL-blue) ![](https://img.shields.io/badge/Platform-Github-success) ![](https://img.shields.io/badge/Version-1.0-red) ![](https://img.shields.io/badge/Language-C%2FC%2B%2B-blueviolet)
+###### 【Designed by Dioxgen】[![](https://img.shields.io/badge/My Website-当代研究所-brightgreen.svg)]({linkUrl}) ![](https://img.shields.io/badge/Licence-GPL-blue) ![](https://img.shields.io/badge/Platform-Github-success) ![](https://img.shields.io/badge/Version-1.0-red) ![](https://img.shields.io/badge/Language-C%2FC%2B%2B-blueviolet)
 
 ###### [[Engilsh](README-EN)|简体中文]
 
@@ -49,12 +49,6 @@ ESP-HMI 是 Link 设备链中的一个，是整个项目最**难**开发的部�
 为了高效率运行程序，我移植了 **FreeRTOS** 操作系统，使得主控芯片可以 “同时” 运行多个程序。
 
 本文档很长，见谅。
-
-#### 项目开发人员：
-
-[$SoTWild$](https://github.com/SoTWild)
-
-<img src="https://s3.bmp.ovh/imgs/2022/10/29/ffaaa19ca3283bd3.jpg" style="zoom:7%; float:left" />
 
 ------
 
